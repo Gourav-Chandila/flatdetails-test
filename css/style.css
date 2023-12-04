@@ -1,0 +1,21 @@
+.error-message {
+    margin-top: 3px;
+    font-size: small;
+    color: red;
+    width: 75%;
+}
+
+
+.form-control {
+    width: 70%;
+}
+
+.doc_title_no_wrap {
+    white-space: nowrap;
+}
+
+.redcolor{
+    background-color: red;
+}
+
+

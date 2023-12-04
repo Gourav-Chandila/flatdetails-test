@@ -1,0 +1,10 @@
+[2023-12-03 15:11:41] General Exception: Unknown column 'SECOND_CONTACT_NUMBER' in 'field list'
+[2023-12-03 15:11:55] General Exception: Unknown column 'SECOND_CONTACT_NUMBER' in 'field list'
+[2023-12-03 15:13:44] General Exception: Cannot add or update a child row: a foreign key constraint fails (`v6`.`party_contact_mech`, CONSTRAINT `PARTY_CMECH_PARTY` FOREIGN KEY (`PARTY_ID`) REFERENCES `party` (`PARTY_ID`))
+[2023-12-03 03:18:43 PM] General Exception: Unknown column 'SECOND_CONTACT_NUMBER' in 'field list'
+[2023-12-03 03:32:23 PM] General Exception: Unknown column 'SECOND_CONTACT_NUMBER' in 'field list'
+[2023-12-03 03:32:45 PM] General Exception: Unknown column 'SECOND_CONTACT_NUMBER' in 'field list'
+[2023-12-03 03:37:42 PM] General Exception: Unknown column 'SECOND_CONTACT_NUMBER' in 'field list'
+[2023-12-03 03:37:57 PM] General Exception: Unknown column 'SECOND_CONTACT_NUMBER' in 'field list'
+[2023-12-03 03:41:09 PM] General Exception: Cannot add or update a child row: a foreign key constraint fails (`v6`.`party_contact_mech`, CONSTRAINT `PARTY_CMECH_PARTY` FOREIGN KEY (`PARTY_ID`) REFERENCES `party` (`PARTY_ID`))
+[2023-12-03 03:42:18 PM] General Exception: Unknown column 'SECOND_CONTACT_NUMBER' in 'field list' in C:\xampp\htdocs\Sysnomy\flatdetails-test\phpfiles\insertData.php on line 48
