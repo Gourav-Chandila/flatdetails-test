@@ -227,7 +227,7 @@ try {
         <div class="container">
             <form id="index2MyForm" action="" method="post" enctype="multipart/form-data">
                 <!-- Handling Form Submission -->
-                <div class="row redcolor">
+                <div class="row ">
                     <!-- test -->
                     <?php
                     $json = json_decode('[{"firstname":{"name":"First Name *","elementName":"firstname","elementIdName":"firstname"}},
@@ -279,30 +279,35 @@ try {
                                 <div class="modal-body">
                                     <form id="fileUploadForm" enctype="multipart/form-data">
                                         <!-- Handling Document Upload-->
+
                                         <?php
                                         $json = json_decode('[{"adharupload":{"name":"Aadhar card :","elementName":"adharupload"}},
-                                         {"pancard":{"name":" Pan Card :","elementName":"pancardupload"}},
-                                        {"allotmentletter":{"name":"Allotment Letter :","elementName":"allotmentletterupload"}},
-                                        {"bba":{"name":"BBA :","elementName":"bbaupload"}},
-                                        {"bankreceipt":{"name":"Bank Receipt :","elementName":"bankreceiptupload"}},
-                                        {"paymentreceipt":{"name":"Payment Receipt :","elementName":"paymentreceiptupload"}}]');
+                                                        {"pancard":{"name":" Pan Card :","elementName":"pancardupload"}},
+                                                        {"allotmentletter":{"name":"Allotment Letter :","elementName":"allotmentletterupload"}},
+                                                        {"bba":{"name":"BBA :","elementName":"bbaupload"}},
+                                                        {"bankreceipt":{"name":"Bank Receipt :","elementName":"bankreceiptupload"}},
+                                                        {"paymentreceipt":{"name":"Payment Receipt :","elementName":"paymentreceiptupload"}}]');
 
                                         foreach ($json as $document) {
                                             $documentName = key($document);
                                             $documentElementName = $document->$documentName->elementName;
 
-                                            echo '<div class="row">';
-                                            echo '    <div class="col-3 doc_title_no_wrap">';
-                                            echo '        ' . $document->$documentName->name;
-                                            echo '    </div>';
-                                            echo '    <div class="col-9">';
-                                            echo '        <div class="form-group">';
-                                            echo '            <input class="form-control form-control-upload" type="file" name="' . $documentElementName . '">';
-                                            echo '        </div>';
-                                            echo '    </div>';
+                                            // Column for the choose file 
+                                            echo '<div class="row my-3">';
+                                            echo '  <div class="col-3 doc_title_no_wrap">';
+                                            echo '    ' . $document->$documentName->name;
+                                            echo '  </div>';
+                                            echo '  <div class="col-9 ">';
+                                            echo '      <div class="custom-file">';
+                                            echo '          <input type="file" class="custom-file-input" id="' . $documentElementName . '" name="' . $documentElementName . '" onchange="displayFileName(this)">';
+                                            echo '          <label class="custom-file-label" for="' . $documentElementName . '">Choose file</label>';
+                                            echo '      </div>';
+                                            echo '  </div>';
                                             echo '</div>';
                                         }
                                         ?>
+
+
                                     </form>
 
                                 </div>
@@ -333,6 +338,18 @@ try {
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js"
         integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6" crossorigin="anonymous">
         </script>
+
+    <script>
+        // Function to display the selected file name in the custom-file-label label
+        function displayFileName(input) {
+            // Get the file name from the input element
+            var fileName = input.files[0].name;
+            // Find the next sibling, which is assumed to be the label for the file input
+            var label = input.nextElementSibling;
+            // Set the innerHTML of the label to the file name, displaying it to the user
+            label.innerHTML = fileName;
+        }// function end
+    </script>
 </body>
 
 </html>
