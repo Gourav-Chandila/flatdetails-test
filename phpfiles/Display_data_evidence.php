@@ -22,17 +22,17 @@ $sql = "SELECT
     c.content_id,
     pcn.PARTY_CONTENT_TYPE_ID,
     pcn.thru_date
-FROM party_copy AS p
-LEFT JOIN person_copy AS pc ON p.PARTY_ID = pc.PARTY_ID
-LEFT JOIN party_contact_mech_copy AS pcm ON p.PARTY_ID = pcm.PARTY_ID
-LEFT JOIN telecom_number_copy AS tn ON pcm.CONTACT_MECH_ID = tn.CONTACT_MECH_ID
-LEFT JOIN postal_address_copy AS pa ON pcm.CONTACT_MECH_ID = pa.CONTACT_MECH_ID
-LEFT JOIN appartment_details_copy AS ad ON p.PARTY_ID = ad.PARTY_ID
-LEFT JOIN contact_mech_copy AS cm ON pcm.CONTACT_MECH_ID = cm.CONTACT_MECH_ID
+FROM party AS p
+LEFT JOIN person AS pc ON p.PARTY_ID = pc.PARTY_ID
+LEFT JOIN party_contact_mech AS pcm ON p.PARTY_ID = pcm.PARTY_ID
+LEFT JOIN telecom_number AS tn ON pcm.CONTACT_MECH_ID = tn.CONTACT_MECH_ID
+LEFT JOIN postal_address AS pa ON pcm.CONTACT_MECH_ID = pa.CONTACT_MECH_ID
+LEFT JOIN appartment_details AS ad ON p.PARTY_ID = ad.PARTY_ID
+LEFT JOIN contact_mech AS cm ON pcm.CONTACT_MECH_ID = cm.CONTACT_MECH_ID
 LEFT JOIN party_content AS pcn ON p.PARTY_ID = pcn.party_id
 LEFT JOIN content AS c ON pcn.content_id = c.content_id
 LEFT JOIN data_resource AS dr ON c.data_resource_id = dr.data_resource_id
-WHERE p.PARTY_ID LIKE 'PID0000%'
+WHERE p.PARTY_ID LIKE '%0000%'
 GROUP BY p.PARTY_ID, pc.FIRST_NAME, pc.LAST_NAME, dr.data_resource_id, c.content_id, pcn.PARTY_CONTENT_TYPE_ID";
 
 
@@ -90,20 +90,16 @@ if ($result->num_rows > 0) {
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css"
         integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
     <link rel="stylesheet" href="https://cdn.datatables.net/1.10.25/css/jquery.dataTables.min.css">
-    <link rel="stylesheet" type="text/css" href="css/style.css">
+    <link rel="stylesheet" type="text/css" href="../css/style.css">
     <title>Display All Allottees</title>
-    <style>
-        td,
-        th {
-            white-space: nowrap;
-        }
-    </style>
+
 </head>
 
 <body>
     <table id="myTable" class="display">
         <thead>
-            <tr>
+
+            <tr bgcolor="#fff6db">
                 <!-- Insert headers in table -->
                 <th>Party ID</th>
                 <th>First Name</th>
@@ -117,6 +113,7 @@ if ($result->num_rows > 0) {
                 <th>Flat Unit Number</th>
                 <th>Evidence</th>
             </tr>
+
         </thead>
         <tbody>
             <?php
@@ -124,11 +121,8 @@ if ($result->num_rows > 0) {
             foreach ($partyEvidence as $party) {
 
                 echo "<tr>";
-
                 echo "<td>{$party['party_id']}</td>";
-                // echo "<td>{$party['First_name']}</td>";
                 echo "<td><a href='allotteeDetails.php?partyId=" . $party['party_id'] . "'>" . $party['First_name'] . "</a></td>";
-
                 echo "<td>{$party['Last_name']}</td>";
                 echo "<td>{$party['Phone number']}</td>";
                 echo "<td>{$party['Second Phone number']}</td>";

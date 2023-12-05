@@ -34,69 +34,11 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         crossorigin="anonymous"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
 
-    <!-- <link rel="stylesheet" type="text/css" href="style.css"> -->
-    <style>
-        .document_container {
-            width: 355px;
-            height: 339px;
-        }
-
-        .Document_image {
-            width: 340px;
-            height: 314px;
-        }
-
-        .dotted-border {
-            background-color: white;
-            border: 2.5px dotted gray;
-            padding: 10px;
-
-        }
-
-        .nowrap {
-            white-space: nowrap;
-        }
-
-        .cream_color {
-            background-color: #fff6db;
-        }
-
-        .error-message {
-            color: red;
-        }
-
-        .address-input-box {
-            border: none;
-            font-weight: bold;
-            width: auto
-        }
-
-        input {
-            width: auto;
-            border: none;
-        }
-
-
-
-        .document-container {
-            width: 100%;
-            height: 100%;
-            max-width: 100%;
-            overflow: hidden;
-
-        }
-
-        .document-image,.document-pdf {
-            width: 100%;
-            height: 500px;
-            display: block;
-        }
-
-
-    </style>
+    <link rel="stylesheet" type="text/css" href="../css/style.css">
+  
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Allottee Details test</title>
+    <title>Allottee Details</title>
 </head>
 
 <body>
@@ -106,8 +48,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             <div class="updateDetails-error-msg" id="updateDetails-error-msg"></div>
             <form id="updateAllotteeDetailsForm" action="" method="post">
                 <div class="row  my-3 cream_color">
-
-
                     <!-- inclue allotte sql script -->
                     <?php
                     //  SQL JOIN QUERY  
@@ -192,13 +132,13 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
                     <div class="col-auto">
                         <h4 class="my-4">Address Details</h4>
-                        <div class="dotted-border my-2">
+                        <div class="dotted-border my-2 ">
                             <!-- Address1 input field -->
-                            <input type="text" id="" class="form-control address-input-box" placeholder="Address1"
+                            <input type="text" id="" class="form-control border-0 font-weight-bold w-auto " placeholder="Address1"
                                 value="<?php echo $address1; ?>" name="address1" id="address1"
                                 oninput="autoSizeInput(this)">
                             <!-- Address2 input field -->
-                            <input type="text" id="" class="form-control address-input-box" placeholder="Address2"
+                            <input type="text" id="" class="form-control border-0 font-weight-bold w-auto " placeholder="Address2"
                                 value="<?php echo $address2; ?>" name="address2" id="address2"
                                 oninput="autoSizeInput(this)">
 
