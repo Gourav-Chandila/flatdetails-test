@@ -112,6 +112,7 @@ function DocsUploadPhp($dataResId, $conId, $uniquePID1, $fileName, $conn, $field
 
         // Generate a unique ID for this alert
         $alertId = uniqid();
+        error_log("[SUCCESS] Document uploaded successfully for party ID $uniquePID1 and file type $fieldNamesStr");
         // Document uploaded successfully
         echo '<div id="' . $alertId . '" class="alert alert-success alert-dismissible fade show" role="success">
         <strong>&#128522;</strong> (' . $fieldNamesStr . '). Uploaded successfully.
@@ -120,6 +121,7 @@ function DocsUploadPhp($dataResId, $conId, $uniquePID1, $fileName, $conn, $field
         </button>
         </div>';
     } catch (Exception $e) {
+        error_log("[ERROR] Error uploading document for party ID $uniquePID1 and file type $fieldNamesStr: " . $e->getMessage());
         // Rollback the transaction in case of an error
         mysqli_rollback($conn);
 
@@ -152,14 +154,14 @@ foreach ($filesToProcess as $fileField => $fileType) {
 
     if (!empty($fileName)) {
 
-        //it check first occorance in url if allotteeDetails.php exists than "$userUploadDir = 'uploads/' . $uniquePID1 . '/'" else "$userUploadDir = 'phpfiles/uploads/' . $uniquePID1 . '/'; "
-        if (strpos($_SERVER['REQUEST_URI'], '/allotteeDetails.php') !== false) {
-            $userUploadDir = 'uploads/' . $uniquePID1 . '/';
-        } else {
-            $userUploadDir = 'phpfiles/uploads/' . $uniquePID1 . '/';
-        }
+        // //it check first occorance in url if allotteeDetails.php exists than "$userUploadDir = 'uploads/' . $uniquePID1 . '/'" else "$userUploadDir = 'phpfiles/uploads/' . $uniquePID1 . '/'; "
+        // if (strpos($_SERVER['REQUEST_URI'], '/allotteeDetails.php') !== false) {
+        //     $userUploadDir = 'uploads/' . $uniquePID1 . '/';
+        // } else {
+        //     $userUploadDir = 'uploads/' . $uniquePID1 . '/';
+        // }
 
-
+        $userUploadDir = 'uploads/' . $uniquePID1 . '/';
         if (!is_dir($userUploadDir)) {
             mkdir($userUploadDir, 0755, true); // Create the directory and its parent directories
         }
