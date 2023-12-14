@@ -81,6 +81,7 @@ $(document).ready(function () {
             },
         },
     });
+
     $('#index2MyForm').validate({
         errorElement: 'div',  // Use <div> for error messages
         errorClass: 'error-message',
@@ -94,7 +95,6 @@ $(document).ready(function () {
                 lettersOnly: true,
             },
             coapplicantname: {
-                // required: true,
                 lettersOnly: true,
             },
 
@@ -107,7 +107,7 @@ $(document).ready(function () {
             sec_phonenumber: {
                 numbersOnly: true,
                 length: true,
-                // notEqualTo: "#phonenumber"
+
             },
             emailaddress: {
                 required: true,
@@ -127,6 +127,16 @@ $(document).ready(function () {
                 required: true,
 
             },
+            password: {
+                required: true,
+                strong: true,
+
+            },
+            c_password: {
+                required: true,
+                equalTo: '#password',
+
+            }
         },
         messages: {
             firstname: {
@@ -168,6 +178,17 @@ $(document).ready(function () {
                 required: " Flat unit number is required !",
 
             },
+
+            password: {
+                required: " Password  is required       !",
+                strong: "Please enter a strong password",
+
+            },
+            c_password: {
+                required: " Confirm Password  is required !",
+                equalTo: "Confirm password is not matching",
+
+            }
         },
     });
 
@@ -216,11 +237,36 @@ $(document).ready(function () {
             sec_phonenumber: {
                 numbersOnly: "Only numeric characters are allowed .",
                 length: "Phone number should have exactly 10 digits.",
-            }
-
+            },
 
         },
     });
+
+    $('#login_page_Form').validate({
+        errorElement: 'div',  // Use <div> for error messages
+        errorClass: 'error-message',
+        rules: {
+            phonenumber: {
+                numbersOnly: true,
+                length: true,
+            },
+            password: {
+                strong: true,
+            }
+        },
+        messages: {
+            phonenumber: {
+                numbersOnly: "Only numeric characters are allowed .",
+                length: "Phone number should have exactly 10 digits.",
+            },
+            password: {
+                strong: "Please enter a strong password",
+            },
+        },
+
+    });
+
+
 
     $.validator.addMethod("lettersOnly", function (value, element) {
         return this.optional(element) || /^[a-zA-Z]+$/.test(value);
@@ -239,9 +285,8 @@ $(document).ready(function () {
         return /^\d+$/.test(value);
     }, "Only numeric characters are allowed in the Phone number.");
 
-    $.validator.addMethod("notEqualTo", function (value, element, param) {
-        return this.optional(element) || value !== $(param).val();
-    }, "The secondary phone number must be different from the main phone number.");
-
+    $.validator.addMethod("strong", function (value, element) {
+        return this.optional(element) || /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@#$%^&+=!]).{8,}$/.test(value);
+    }, "Please enter a strong password ");
 
 });//end of jQuery code
