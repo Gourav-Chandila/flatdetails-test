@@ -8,13 +8,12 @@ require 'insertData.php';
 function generateUniqueId($conn, $prefix, $tableName)
 {
     // Specify the path to a lock file
-// Specify the path to a lock file
-$lockFilePath =  'Sync.lock';
+    $lockFilePath = 'Sync.lock';
 
     // Attempt to acquire an exclusive lock
     $lockFile = fopen($lockFilePath, 'w');
 
-    if (flock($lockFile, LOCK_EX)) {
+    if ($lockFile && flock($lockFile, LOCK_EX)) {
         // Inside the critical section (only one process can be here at a time)
         // Execute the SQL query to count records
         $countSqlRec = "SELECT COUNT(*) AS record_count FROM $tableName";
@@ -37,6 +36,9 @@ $lockFilePath =  'Sync.lock';
             // Close the lock file
             fclose($lockFile);
 
+            // Set permissions on the lock file (adjust the mode as needed)
+            chmod($lockFilePath, 0644);
+
             // Return the unique ID
             return $uniqueId;
         } else {
@@ -48,10 +50,12 @@ $lockFilePath =  'Sync.lock';
             // Close the lock file
             fclose($lockFile);
 
+            echo "SQL Query Error: " . mysqli_error($conn);
             return false;
         }
     } else {
         // Unable to acquire lock, handle accordingly
+        echo "Unable to acquire lock.";
         fclose($lockFile);
         return "Unable to generate ID at this time.";
     }
@@ -61,6 +65,7 @@ $lockFilePath =  'Sync.lock';
 // $generatedId = generateUniqueId($conn, "TEST", "test_id");
 // echo $generatedId;
 
+// // Assuming insertData is defined in insertData.php
 // $insertTestId = array(
 //     'PARTY_ID' => $generatedId,
 //     // 'parallel' => 'parallel1',
@@ -68,8 +73,4 @@ $lockFilePath =  'Sync.lock';
 
 // // Assuming insertData is defined in insertData.php
 // insertData("test_id", $insertTestId, $conn);
-
-
-
-
 ?>

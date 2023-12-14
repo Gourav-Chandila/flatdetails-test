@@ -47,12 +47,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
                         error_log('First name from index: ' . $_SESSION['first_name'], 0);
                         error_log('Last name from index: ' . $_SESSION['last_name'], 0);
+                        header("Location: http://localhost/sysnomy/flatdetails-test/phpfiles/allotteeDetails.php");
                     } else {
                         error_log('Error getting first_name and last_name from session in index file', 0);
                     }
                 }
                 // Redirect to allotteeDetails page
-                header("Location: http://localhost/sysnomy/flatdetails-test/phpfiles/allotteeDetails.php");
 
             }
         }
@@ -82,15 +82,16 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     <!-- Bootstrap CSS -->
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css"
         integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
-    <!-- <link rel="stylesheet" type="text/css" href="css/style.css"> -->
+    <link rel="stylesheet" type="text/css" href="css/style.css">
     <title>Login page</title>
 </head>
 
 <body>
 
     <?php require 'phpfiles/navbar.php' ?>
+    
     <div class="container my-5 align-items-center">
-        <form action="index.php" id="login_page_Form" method="post">
+        <form action="index.php" id="login_page_Form" class="login_page_Form" method="post">
             <?php
             $json = json_decode('[{"phonenumber":{"name":"Phone number","elementName":"phonenumber","elementIdName":"phonenumber","inputType":""}},
                               {"password":{"name":"Pasword","elementName":"password","elementIdName":"password","inputType":"password"}}]');
@@ -119,10 +120,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
             ?>
 
-
-
-
-
             <div class="container">
                 <div class="row col">
                     <div class="form-group">
@@ -136,8 +133,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             </div>
         </form>
     </div>
+<div>
 
 
+   
 
     <!-- Optional JavaScript -->
     <!-- jQuery first, then Popper.js, then Bootstrap JS -->
@@ -155,7 +154,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6" crossorigin="anonymous">
         </script>
 
-
+<?php require 'phpfiles/footer.php'?>
 
 </body>
 

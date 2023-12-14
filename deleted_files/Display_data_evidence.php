@@ -2,37 +2,6 @@
 // Include your database connection code
 require 'db_connect.php';
 
-// SQL query to retrieve data from multiple tables
-// $sql = "SELECT
-//     p.PARTY_ID,
-//     pc.FIRST_NAME,
-//     pc.LAST_NAME,
-//     MAX(pcm.CONTACT_MECH_ID) AS CONTACT_MECH_ID,
-//     MAX(tn.CONTACT_NUMBER) AS CONTACT_NUMBER,
-//     MAX(tn.SECOND_CONTACT_NUMBER) AS SECOND_CONTACT_NUMBER,
-//     MAX(pa.ADDRESS1) AS ADDRESS1,
-//     MAX(pa.ADDRESS2) AS ADDRESS2,
-//     MAX(ad.COAPPLICANT_NAME) AS COAPPLICANT_NAME,
-//     MAX(ad.FLAT_UNIT_NUMBER) AS FLAT_UNIT_NUMBER,
-//     MAX(CASE
-//         WHEN cm.CONTACT_MECH_TYPE_ID = 'EMAIL_ADDRESS' THEN cm.INFO_STRING
-//         ELSE NULL
-//         END) AS EXTRACTED_EMAIL,
-//     dr.data_resource_id,
-//     c.content_id,
-//     pcn.PARTY_CONTENT_TYPE_ID
-// FROM party_copy AS p
-// LEFT JOIN person_copy AS pc ON p.PARTY_ID = pc.PARTY_ID
-// LEFT JOIN party_contact_mech_copy AS pcm ON p.PARTY_ID = pcm.PARTY_ID
-// LEFT JOIN telecom_number_copy AS tn ON pcm.CONTACT_MECH_ID = tn.CONTACT_MECH_ID
-// LEFT JOIN postal_address_copy AS pa ON pcm.CONTACT_MECH_ID = pa.CONTACT_MECH_ID
-// LEFT JOIN appartment_details_copy AS ad ON p.PARTY_ID = ad.PARTY_ID
-// LEFT JOIN contact_mech_copy AS cm ON pcm.CONTACT_MECH_ID = cm.CONTACT_MECH_ID
-// LEFT JOIN party_content AS pcn ON p.PARTY_ID = pcn.party_id
-// LEFT JOIN content AS c ON pcn.content_id = c.content_id
-// LEFT JOIN data_resource AS dr ON c.data_resource_id = dr.data_resource_id
-// GROUP BY p.PARTY_ID, pc.FIRST_NAME, pc.LAST_NAME, dr.data_resource_id, c.content_id, pcn.PARTY_CONTENT_TYPE_ID";
-
 $sql = "SELECT
     p.PARTY_ID,
     pc.FIRST_NAME,

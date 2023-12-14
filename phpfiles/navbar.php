@@ -47,7 +47,7 @@ if (!$loggedin) {
 
 // Show logout button if the user is logged in and on allotteeDetails.php
 if ($loggedin && $current_page == "allotteeDetails.php") {
-  echo '<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+  echo '<nav class="navbar navbar-expand-lg navbar-dark fixed-top" style="background-color: rgba(0, 0, 0, 0.3);">
     <div class="container-fluid">
       <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation">
         <span class="navbar-toggler-icon"></span>

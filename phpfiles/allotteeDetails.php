@@ -2,6 +2,15 @@
 error_reporting(0);
 // Start the session
 session_start();
+// Check if "party_id" is not set in the session
+if (!isset($_SESSION['party_id'])) {
+    // Redirect to the login page
+    header("Location: /sysnomy/flatdetails-test/");
+    exit(); // Ensure that no further code is executed after the redirect
+}
+
+
+
 error_log('Party id is : ' . $_SESSION['party_id'], 0);
 // Include necessary files
 require 'generateUniqueId.php';
@@ -41,20 +50,23 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Allottee Details</title>
+    <style>
+        margin-top:56px;
+    </style>
 </head>
 
 <body>
     <?php require 'navbar.php' ?>
-    <div class="container-fluid ">
+    <div class="container-fluid mb-2">
         <div class="container">
             <div class="updateDetails-error-msg" id="updateDetails-error-msg"></div>
             <form id="updateAllotteeDetailsForm" action="" method="post">
-                <div class="row  my-3 cream_color">
+                <div class="row  my-3 cream_color ">
                     <!-- inclue allotte sql script -->
                     <?php
                     //  SQL JOIN QUERY  
                     if (isset($_SESSION['party_id'])) {
-                        $partyId = $_SESSION['party_id'];//getting party_id from session
+                        $partyId = $_SESSION['party_id']; //getting party_id from session
                         $retrieveAlloteeDetails = "SELECT p.PARTY_ID, pc.FIRST_NAME, pc.LAST_NAME, MAX(pcm.CONTACT_MECH_ID) AS CONTACT_MECH_ID,
                         MAX(tn.CONTACT_NUMBER) AS CONTACT_NUMBER,
                         MAX(tn.SECOND_CONTACT_NUMBER) AS SECOND_CONTACT_NUMBER,
@@ -109,7 +121,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                     }
                     ?>
 
-                    
+
                     <!-- Display allottee details in input field -->
                     <div>
                         <div class="col my-4">
@@ -490,7 +502,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     </script>
 
 
-
+    <?php require 'footer.php' ?>
 </body>
 
 </html>

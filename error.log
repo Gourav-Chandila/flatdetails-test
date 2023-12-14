@@ -8,3 +8,7 @@
 [2023-12-03 03:37:57 PM] General Exception: Unknown column 'SECOND_CONTACT_NUMBER' in 'field list'
 [2023-12-03 03:41:09 PM] General Exception: Cannot add or update a child row: a foreign key constraint fails (`v6`.`party_contact_mech`, CONSTRAINT `PARTY_CMECH_PARTY` FOREIGN KEY (`PARTY_ID`) REFERENCES `party` (`PARTY_ID`))
 [2023-12-03 03:42:18 PM] General Exception: Unknown column 'SECOND_CONTACT_NUMBER' in 'field list' in C:\xampp\htdocs\Sysnomy\flatdetails-test\phpfiles\insertData.php on line 48
+[2023-12-08 04:00:01 PM] General Exception: Duplicate entry 'PID000000000462' for key 'PRIMARY' in C:\xampp\htdocs\Sysnomy\flatdetails-test\phpfiles\insertData.php on line 48
+[2023-12-08 04:02:07 PM] General Exception: Duplicate entry 'PID000000000463' for key 'PRIMARY' in C:\xampp\htdocs\Sysnomy\flatdetails-test\phpfiles\insertData.php on line 48
+[2023-12-08 04:02:35 PM] General Exception: Unknown column 'PARTY_TYPE_ID' in 'field list' in C:\xampp\htdocs\Sysnomy\flatdetails-test\phpfiles\insertData.php on line 48
+[2023-12-08 04:03:25 PM] General Exception: Unknown column 'PARTY_TYPE_ID' in 'field list' in C:\xampp\htdocs\Sysnomy\flatdetails-test\phpfiles\insertData.php on line 48
