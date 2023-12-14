@@ -3,10 +3,10 @@
 require 'db_connect.php';
 require 'generateDateTime.php';
 header('Content-Type: application/json');
-
+session_start();
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    if (isset($_POST['partyId'])) {
+    if (isset($_SESSION['party_id'])) {
         try {
             // Start a transaction
             mysqli_begin_transaction($conn);
@@ -16,8 +16,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 return mysqli_real_escape_string($conn, $value);
             }, $_POST);
             // Extract individual variables from the sanitized array  
-            $partyIdFromUrl = $escapedPostData['partyId']; // Assuming partyId is present in $_POST
-            $firstName = $escapedPostData['firstname'];
+            // $partyIdFromUrl = $escapedPostData['partyId']; // Assuming partyId is present in $_POST
+            $firstName = $escapedPostData['firstname']; // Assuming first name is present in $_POST
             $lastName = $escapedPostData['lastname'];
             $coapplicantName = $escapedPostData['coapplicantname'];
             $flatUnitNo = $escapedPostData['flatunitnumber'];
@@ -27,23 +27,25 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             $address2 = $escapedPostData['address2'];
             $emailAddress = $escapedPostData['primaryemail'];
 
+            // $partyIdFrmSession = $_SESSION['party_id'];
+            $partyIdFrmSession = $_SESSION['party_id'];
             $updateAllotteeDetails = "
                 UPDATE person AS p
                 JOIN appartment_details AS ad ON p.PARTY_ID = ad.PARTY_ID
                 JOIN telecom_number AS tn ON tn.contact_mech_id = (
                     SELECT pcm.contact_mech_id
                     FROM party_contact_mech pcm
-                    WHERE pcm.contact_mech_id = tn.contact_mech_id AND pcm.party_id = '$partyIdFromUrl'
+                    WHERE pcm.contact_mech_id = tn.contact_mech_id AND pcm.party_id = '$partyIdFrmSession'
                 )
                 JOIN postal_address AS pa ON pa.contact_mech_id = (
                     SELECT pcm.contact_mech_id
                     FROM party_contact_mech pcm
-                    WHERE pcm.contact_mech_id = pa.contact_mech_id AND pcm.party_id = '$partyIdFromUrl'
+                    WHERE pcm.contact_mech_id = pa.contact_mech_id AND pcm.party_id = '$partyIdFrmSession'
                 )
                 JOIN contact_mech ON contact_mech.contact_mech_id = (
                     SELECT pcm.contact_mech_id
                     FROM party_contact_mech pcm
-                    WHERE pcm.contact_mech_id = contact_mech.contact_mech_id AND pcm.party_id = '$partyIdFromUrl'
+                    WHERE pcm.contact_mech_id = contact_mech.contact_mech_id AND pcm.party_id = '$partyIdFrmSession'
                 )
                 JOIN party_contact_mech pcm ON contact_mech.contact_mech_id = pcm.contact_mech_id
                 SET
@@ -67,7 +69,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                         WHEN contact_mech.contact_mech_type_id = 'EMAIL_ADDRESS' THEN '$emailAddress'
                         ELSE NULL
                     END
-                WHERE p.PARTY_ID = '$partyIdFromUrl';
+                WHERE p.PARTY_ID = '$partyIdFrmSession';
             ";
 
             $Htmlresponse = [];

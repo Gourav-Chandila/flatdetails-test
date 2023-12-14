@@ -154,12 +154,6 @@ foreach ($filesToProcess as $fileField => $fileType) {
 
     if (!empty($fileName)) {
 
-        // //it check first occorance in url if allotteeDetails.php exists than "$userUploadDir = 'uploads/' . $uniquePID1 . '/'" else "$userUploadDir = 'phpfiles/uploads/' . $uniquePID1 . '/'; "
-        // if (strpos($_SERVER['REQUEST_URI'], '/allotteeDetails.php') !== false) {
-        //     $userUploadDir = 'uploads/' . $uniquePID1 . '/';
-        // } else {
-        //     $userUploadDir = 'uploads/' . $uniquePID1 . '/';
-        // }
 
         $userUploadDir = 'uploads/' . $uniquePID1 . '/';
         if (!is_dir($userUploadDir)) {

@@ -1,10 +1,13 @@
 <?php
 // Include your database connection file
 require 'db_connect.php';
-
+session_start();
+// echo $_SESSION['party_id'];
 // Check if the necessary parameters are present in the POST request
-if (isset($_POST['partyId']) && isset($_POST['evidenceType'])) {
-    $partyId = mysqli_real_escape_string($conn, $_POST['partyId']);
+if (isset($_SESSION['party_id']) && isset($_POST['evidenceType'])) {
+
+    // Determine the party_id based on the available session variable
+    $partyId = $_SESSION['party_id'];
     $evidenceType = mysqli_real_escape_string($conn, $_POST['evidenceType']);
     // error_log("Evidence Type is : " . $evidenceType);
 

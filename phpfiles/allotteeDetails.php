@@ -1,26 +1,28 @@
 <?php
+error_reporting(0);
+// Start the session
+session_start();
+error_log('Party id is : ' . $_SESSION['party_id'], 0);
+// Include necessary files
 require 'generateUniqueId.php';
 require 'insertData.php';
 require 'db_connect.php';
-?>
 
-
-
-<!DOCTYPE html>
-<html lang="en">
-<?php
-// Check if the request method is POST
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-    // Check if "partyId" is set in the URL parameters (query string)
-    if (isset($_GET['partyId'])) {
-        $partyIdFromUrl = mysqli_real_escape_string($conn, $_GET['partyId']);
-        $uniquePID1 = $partyIdFromUrl;
+    // Check if "partyId" is set in the session 
+    if (isset($_SESSION['party_id'])) {
+        $uniquePID1 = $_SESSION['party_id'];
+        // Include necessary files
         require 'generateDateTime.php';
-        // require 'generateUniqueId.php';
         require 'uploadDocuments.php';
+    } else {
+        error_log('Error getting user document details because "party_id" in session is not fetching in allotteeDetails page', 0);
     }
 }
 ?>
+
+<!DOCTYPE html>
+<html lang="en">
 
 <head>
 
@@ -35,14 +37,14 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
 
     <link rel="stylesheet" type="text/css" href="../css/style.css">
-  
+
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Allottee Details</title>
 </head>
 
 <body>
-
+    <?php require 'navbar.php' ?>
     <div class="container-fluid ">
         <div class="container">
             <div class="updateDetails-error-msg" id="updateDetails-error-msg"></div>
@@ -51,8 +53,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                     <!-- inclue allotte sql script -->
                     <?php
                     //  SQL JOIN QUERY  
-                    if (isset($_GET['partyId'])) {
-                        $partyId = mysqli_real_escape_string($conn, $_GET['partyId']); // Sanitize the input
+                    if (isset($_SESSION['party_id'])) {
+                        $partyId = $_SESSION['party_id'];//getting party_id from session
                         $retrieveAlloteeDetails = "SELECT p.PARTY_ID, pc.FIRST_NAME, pc.LAST_NAME, MAX(pcm.CONTACT_MECH_ID) AS CONTACT_MECH_ID,
                         MAX(tn.CONTACT_NUMBER) AS CONTACT_NUMBER,
                         MAX(tn.SECOND_CONTACT_NUMBER) AS SECOND_CONTACT_NUMBER,
@@ -89,7 +91,9 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                             $row = mysqli_fetch_assoc($resultRetrieveAlloteeDetails);
                             // Extracting individual values from the fetched row
                             $firstName = $row['FIRST_NAME'];
+                            $_SESSION['first_name'] = $row['FIRST_NAME'];
                             $lastName = $row['LAST_NAME'];
+                            $_SESSION['last_name'] = $row['LAST_NAME'];
                             $phoneNumber = $row['CONTACT_NUMBER'];
                             $secPhoneNumber = $row['SECOND_CONTACT_NUMBER'];
                             $emailAddress = $row['EXTRACTED_EMAIL'];
@@ -97,15 +101,15 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                             $coapplicantName = $row['COAPPLICANT_NAME'];
                             $address1 = $row['ADDRESS1'];
                             $address2 = $row['ADDRESS2'];
-
                         } else {
                             echo "Error: " . mysqli_error($conn);
                         }
                     } else {
-                        echo "Invalid or missing 'partyId' parameter.";
+                        error_log("Error getting user details because 'party_id' in session is not fetching in allotteeDetails page.", 0);
                     }
-
                     ?>
+
+                    
                     <!-- Display allottee details in input field -->
                     <div>
                         <div class="col my-4">
@@ -134,12 +138,12 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                         <h4 class="my-4">Address Details</h4>
                         <div class="dotted-border my-2 ">
                             <!-- Address1 input field -->
-                            <input type="text" id="" class="form-control border-0 font-weight-bold w-auto " placeholder="Address1"
-                                value="<?php echo $address1; ?>" name="address1" id="address1"
+                            <input type="text" id="" class="form-control border-0 font-weight-bold w-auto "
+                                placeholder="Address1" value="<?php echo $address1; ?>" name="address1" id="address1"
                                 oninput="autoSizeInput(this)">
                             <!-- Address2 input field -->
-                            <input type="text" id="" class="form-control border-0 font-weight-bold w-auto " placeholder="Address2"
-                                value="<?php echo $address2; ?>" name="address2" id="address2"
+                            <input type="text" id="" class="form-control border-0 font-weight-bold w-auto "
+                                placeholder="Address2" value="<?php echo $address2; ?>" name="address2" id="address2"
                                 oninput="autoSizeInput(this)">
 
                             <script>
@@ -277,10 +281,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             </div>
         </div>
     </div>
-
-
-
-
 
 
 

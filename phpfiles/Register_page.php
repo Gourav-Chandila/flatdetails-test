@@ -80,7 +80,7 @@ try {
 
             // Insert user data into the 'user_login' table
             $hashedPassword = password_hash($password, PASSWORD_DEFAULT); //Generate hash password
-            $userLoginId = generateUniqueId($conn, "UID", "user_login");
+            $userLoginId = $phonenumber;
             $insertUserLoginSql = array(
                 'USER_LOGIN_ID' => $userLoginId,
                 'PARTY_ID' => $uniquePID1,
@@ -147,6 +147,14 @@ try {
                     session_start();
                     $_SESSION['loggedin'] = true;
                     $_SESSION['party_id'] = $uniquePID1;
+                    $_SESSION['user_login_id'] = $userLoginId;
+                    $_SESSION['first_name'] = $firstname;
+                    $_SESSION['last_name'] = $lastname;
+                    // error_log('Party id from Register_page : ' . $_SESSION['party_id'], 0);
+                    // error_log('User login id from Register_page : ' . $_SESSION['user_login_id'], 0);
+                    // error_log('First name from Register_page : ' . $_SESSION['first_name'], 0);
+                    // error_log('Last name from Register_page : ' . $_SESSION['last_name'], 0);
+
                     // Display a success message if the user data is inserted successfully
                     echo '<div class="alert alert-success alert-dismissible fade show" role="success" id="myAlert">
                 <strong>&#128522;</strong> Registered successfully.
@@ -157,7 +165,7 @@ try {
                     echo '  <div class="alert alert-primary" role="alert">A simple primary alert—check it out!</div>';
                     //Handling Documents Upload
                     require 'uploadDocuments.php';
-                    header("Location: http://localhost/sysnomy/flatdetails-test/phpfiles/allotteeDetails.php?partyId=$uniquePID1");
+                    header("Location: http://localhost/sysnomy/flatdetails-test/phpfiles/allotteeDetails.php");
                     // Use JavaScript to redirect to Display_data.php after 3 seconds
                     // echo "<script>
                     //     setTimeout(function() {
@@ -220,13 +228,12 @@ try {
 <body>
 
 
-
     <?php require 'navbar.php'; ?>
     <div class="container-fluid">
 
         <div class="container">
 
-            <form id="index2MyForm" action="Register_page2.php" method="post" enctype="multipart/form-data">
+            <form id="index2MyForm" action="Register_page.php" method="post" enctype="multipart/form-data">
                 <!-- Handling Form Submission -->
                 <div class="row">
                     <!-- Left Side (col-6) -->

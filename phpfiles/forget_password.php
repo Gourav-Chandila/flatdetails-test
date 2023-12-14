@@ -34,6 +34,13 @@ if (isset($_POST['submit'])) {
                                     <span aria-hidden="true">×</span>
                                 </button>
                             </div>';
+                               // Use JavaScript to redirect to Display_data.php after 3 seconds
+                    echo '<script>
+                        setTimeout(function() {
+                            window.location.href = "/sysnomy/flatdetails-test/index.php";
+                        }, 2000); // 3 seconds
+                    </script>';
+
             } else {
                 echo "Error updating password: " . mysqli_error($conn);
             }

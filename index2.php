@@ -6,6 +6,7 @@ require 'phpfiles/insertData.php';
 function handleDatabaseException($message)
 {
 
+    
     // Display a generic error message on the screen
     echo '<div class="alert alert-danger alert-dismissible fade show" role="alert">
         <strong>&#10071; There are some technical issues at this time. Please try again later. </strong> 
@@ -40,7 +41,6 @@ try {
         $flatunitnumber = $_POST['flatunitnumber'];
         $address1 = $_POST['address1'];
         $address2 = $_POST['address2'];
-        $password = $_POST['password'];
 
         // Include the database connection file
         require 'phpfiles/db_connect.php';
@@ -66,6 +66,7 @@ try {
             require 'phpfiles/generateUniqueId.php';
             $uniquePID1 = generateUniqueId($conn, "PID", "party");
             echo $uniquePID1;
+
             // Insert user data into the 'party' table
             $partyTypeId = "PERSON";
             $insertPartySql = array(
@@ -75,17 +76,6 @@ try {
             );
             insertData("party", $insertPartySql, $conn);
 
-          
-            // Insert user data into the 'user_login' table
-            $hashedPassword = password_hash($password, PASSWORD_DEFAULT);//Generate hash password
-            $userLoginId = generateUniqueId($conn, "UID", "user_login");
-            $insertUserLoginSql = array(
-                'USER_LOGIN_ID' => $userLoginId,
-                'PARTY_ID' => $uniquePID1,
-                'CURRENT_PASSWORD' => $hashedPassword,
-
-            );
-            insertData("user_login", $insertUserLoginSql, $conn);
 
             // Insert user data into the 'person_copy' table
             $insertPersonDetailsSql = array(
@@ -234,65 +224,35 @@ try {
 
 <body>
     <div class="container-fluid">
-        <nav class="navbar navbar-light bg-light">
-            <a class="navbar-brand">Navbar</a>
-            <form class="form-inline">
-                <input class="form-control mr-sm-2" type="search" placeholder="Search" aria-label="Search">
-                <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Search</button>
-            </form>
-        </nav>
 
         <div class="container">
-
-            <form id="index2MyForm" action="" method="post" enctype="multipart/form-data">
+            <form id="MyForm" action="" method="post" enctype="multipart/form-data">
                 <!-- Handling Form Submission -->
-                <div class="row">
+                <div class="row ">
+                    <!-- test -->
+                    <?php
+                    $json = json_decode('[{"firstname":{"name":"First Name *","elementName":"firstname","elementIdName":"firstname"}},
+            {"lastname":{"name":"Last name","elementName":"lastname","elementIdName":"lastname"}},
+            {"coapplicant_name":{"name":"Coapplicant Name","elementName":"coapplicantname","elementIdName":"coapplicantname"}},
+            {"phonenumber":{"name":"Phone number *","elementName":"phonenumber","elementIdName":"phonenumber"}},
+            {"sec_phonenumber":{"name":"Secondary phone number","elementName":"sec_phonenumber","elementIdName":"sec_phonenumber"}},
+            {"emailaddress":{"name":"Email address *","elementName":"emailaddress","elementIdName":"emailaddress"}},
+            {"address1":{"name":"Address1","elementName":"address1","elementIdName":"address1"}},
+            {"address2":{"name":"Address2","elementName":"address2","elementIdName":"address2"}},
+            {"flatunitnumber":{"name":"Flat unit number","elementName":"flatunitnumber","elementIdName":"flatunitnumber"}}]');
 
-                    <!-- Left Side (col-6) -->
-                    <div class="col-md-6 pink my-4">
-                        <?php
-                        $jsonLeft = json_decode('[{"firstname":{"name":"First Name *","elementName":"firstname","elementIdName":"firstname"}},
-                         {"lastname":{"name":"Last name","elementName":"lastname","elementIdName":"lastname"}},
-                         {"coapplicant_name":{"name":"Coapplicant Name","elementName":"coapplicantname","elementIdName":"coapplicantname"}},
-                         {"sec_phonenumber":{"name":"Secondary phone number","elementName":"sec_phonenumber","elementIdName":"sec_phonenumber"}},
-                         {"address1":{"name":"Address1","elementName":"address1","elementIdName":"address1"}},
-                         {"address2":{"name":"Address2","elementName":"address2","elementIdName":"address2"}},
-                         {"flatunitnumber":{"name":"Flat unit number","elementName":"flatunitnumber","elementIdName":"flatunitnumber"}}]');
+                    foreach ($json as $field) {
+                        $formName = key($field);
+                        $formData = current($field);
 
-                        foreach ($jsonLeft as $field) {
-                            $formName = key($field);
-                            $formData = current($field);
-                            echo '    <div class="form-group">';
-                            echo '        <label for="' . $formData->elementName . '">' . $formData->name . '</label>';
-                            echo '        <input type="text" name="' . $formData->elementName . '" class="form-control custom-input" id="' . $formData->elementIdName . '">';
-                            echo '    </div>';
-                        }
-                        ?>
-                    </div>
-
-                    <!-- Right Side (col-6) -->
-                    <div class="col-md-6 green my-4">
-                        <?php
-                        $jsonRight = json_decode('[{"emailaddress":{"name":"Email address","elementName":"emailaddress","elementIdName":"emailaddress","inputType":"text"}},
-                         {"phonenumber":{"name":"Phone number *","elementName":"phonenumber","elementIdName":"phonenumber","inputType":""}},
-                         {"password":{"name":"Password","elementName":"password","elementIdName":"password","inputType":"password"}},
-                         {"c_password":{"name":"Confirm password","elementName":"c_password","elementIdName":"c_password","inputType":"password"}}]');
-
-                        foreach ($jsonRight as $field) {
-                            $formName = key($field);
-                            $formData = current($field);
-
-
-                            echo '    <div class="form-group">';
-                            echo '        <label for="' . $formData->elementName . '">' . $formData->name . '</label>';
-                            echo '        <input type="' . $formData->inputType . '" name="' . $formData->elementName . '" class="form-control custom-input" id="' . $formData->elementIdName . '">';
-                            echo '    </div>';
-
-                        }
-                        ?>
-                    </div>
-
-
+                        echo '<div class="col-md-7">';
+                        echo '    <div class="form-group">';
+                        echo '        <label for="' . $formData->elementName . '">' . $formData->name . '</label>';
+                        echo '        <input type="text" name="' . $formData->elementName . '" class="form-control custom-input" id="' . $formData->elementIdName . '">';
+                        echo '    </div>';
+                        echo '</div>';
+                    }
+                    ?>
                 </div>
 
                 <div class="row">

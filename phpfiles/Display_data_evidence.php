@@ -2,6 +2,8 @@
 // Include your database connection code
 require 'db_connect.php';
 
+// Start the session
+session_start();
 
 $sql = "SELECT
     p.PARTY_ID,
@@ -34,7 +36,6 @@ LEFT JOIN content AS c ON pcn.content_id = c.content_id
 LEFT JOIN data_resource AS dr ON c.data_resource_id = dr.data_resource_id
 WHERE p.PARTY_ID LIKE '%0000%'
 GROUP BY p.PARTY_ID, pc.FIRST_NAME, pc.LAST_NAME, dr.data_resource_id, c.content_id, pcn.PARTY_CONTENT_TYPE_ID";
-
 
 // Execute the SQL query
 $result = $conn->query($sql);
@@ -78,7 +79,6 @@ if ($result->num_rows > 0) {
 }
 ?>
 
-
 <!doctype html>
 <html lang="en">
 
@@ -92,15 +92,13 @@ if ($result->num_rows > 0) {
     <link rel="stylesheet" href="https://cdn.datatables.net/1.10.25/css/jquery.dataTables.min.css">
     <link rel="stylesheet" type="text/css" href="../css/style.css">
     <title>Display All Allottees</title>
-
 </head>
 
 <body>
     <table id="myTable" class="display">
         <thead>
-
             <tr bgcolor="#fff6db">
-                <!-- Insert headers in table -->
+                <!-- Insert headers in the table -->
                 <th>Party ID</th>
                 <th>First Name</th>
                 <th>Last Name</th>
@@ -113,16 +111,16 @@ if ($result->num_rows > 0) {
                 <th>Flat Unit Number</th>
                 <th>Evidence</th>
             </tr>
-
         </thead>
         <tbody>
             <?php
-            //itrate through loop and insert values in columns
+            // Iterate through the loop and insert values in columns
             foreach ($partyEvidence as $party) {
-
+                error_reporting(0);
                 echo "<tr>";
                 echo "<td>{$party['party_id']}</td>";
-                echo "<td><a href='allotteeDetails.php?partyId=" . $party['party_id'] . "'>" . $party['First_name'] . "</a></td>";
+
+                echo "<td><a href='#' onclick='setPartyIdInSessionAndRedirect(\"{$party['party_id']}\");'>" . $party['First_name'] . "</a></td>";
                 echo "<td>{$party['Last_name']}</td>";
                 echo "<td>{$party['Phone number']}</td>";
                 echo "<td>{$party['Second Phone number']}</td>";
@@ -148,6 +146,24 @@ if ($result->num_rows > 0) {
         $(document).ready(function () {
             $('#myTable').DataTable();
         });
+    </script>
+
+    <!-- Additional script for setting session variable and redirecting -->
+    <script>
+        function setPartyIdInSessionAndRedirect(partyId) {
+            $.ajax({
+                type: 'POST',
+                url: 'set_session_of_Display_data_evidence.php',
+                data: { party_id: partyId },
+                success: function (response) {
+                    console.log(response);
+                    setTimeout(function () {
+                        window.location.href = '/sysnomy/flatdetails-test/phpfiles/allotteeDetails.php';
+                    }, 1000); // 3 seconds
+
+                }
+            });
+        }
     </script>
 </body>
 

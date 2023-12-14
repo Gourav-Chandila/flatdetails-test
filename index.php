@@ -1,18 +1,15 @@
 <?php
 
-
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     // Connecting to the Database
     require 'phpfiles/db_connect.php';
-
     $phonenumber = $_POST["phonenumber"];
     $password = $_POST["password"];
-
-    $sql = "SELECT pcm.PARTY_ID, pcm.CONTACT_MECH_ID, tn.CONTACT_NUMBER, ul.CURRENT_PASSWORD
-            FROM party_contact_mech pcm
-            JOIN telecom_number tn ON pcm.contact_mech_id = tn.contact_mech_id
-            JOIN user_login ul ON ul.PARTY_ID = pcm.PARTY_ID
-            WHERE tn.contact_number = '$phonenumber'";
+    //check details in db exist or not 
+    $sql = "SELECT tn.CONTACT_NUMBER, ul.PARTY_ID, ul.CURRENT_PASSWORD, ul.USER_LOGIN_ID
+               FROM user_login ul
+               JOIN telecom_number tn ON ul.USER_LOGIN_ID = tn.CONTACT_NUMBER
+               WHERE ul.USER_LOGIN_ID = '$phonenumber'";
 
     $result = mysqli_query($conn, $sql);
     $num = mysqli_num_rows($result);
@@ -23,6 +20,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             if (password_verify($password, $row['CURRENT_PASSWORD'])) {
                 // Set session variable
                 session_start();
+                $_SESSION['party_id'] = $row['PARTY_ID'];
+                $_SESSION['user_login_id'] = $row['USER_LOGIN_ID'];
+                // error_log('Party id from index : ' . $_SESSION['party_id'], 0);
+                // error_log('User login id from index : ' . $_SESSION['user_login_id'], 0);
+
                 $_SESSION['loggedin'] = true;
                 echo '<div class="alert alert-success alert-dismissible fade show" role="alert">
                 Login successfully .
@@ -30,23 +32,37 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 <span aria-hidden="true">×</span>
                 </button>
                 </div>';
-                // Use JavaScript to redirect to Display_data.php after 3 seconds
-                echo "<script>
-                    setTimeout(function() {
-                        window.location.href = 'phpfiles/allotteeDetails.php?partyId=" . $row['PARTY_ID'] . "';
-                    }, 2000); // 3 seconds
-                </script>";
-            } else {
-                echo '<div class="alert alert-danger alert-dismissible fade show" role="alert">
-                <strong>&#10071;</strong>Invalid credintials.
-                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                <span aria-hidden="true">×</span>
-                </button>
-                </div>';
+
+                if (isset($_SESSION['party_id'])) {
+                    $partyId = $_SESSION['party_id'];
+
+                    $getpersonDetailsSql = "SELECT FIRST_NAME, LAST_NAME FROM person WHERE party_id = '$partyId';";
+                    $resultGetpersonDetailsSql = mysqli_query($conn, $getpersonDetailsSql);
+
+                    if ($resultGetpersonDetailsSql) {
+                        $row = mysqli_fetch_assoc($resultGetpersonDetailsSql);
+
+                        $_SESSION['first_name'] = $row['FIRST_NAME'];
+                        $_SESSION['last_name'] = $row['LAST_NAME'];
+
+                        error_log('First name from index: ' . $_SESSION['first_name'], 0);
+                        error_log('Last name from index: ' . $_SESSION['last_name'], 0);
+                    } else {
+                        error_log('Error getting first_name and last_name from session in index file', 0);
+                    }
+                }
+                // Redirect to allotteeDetails page
+                header("Location: http://localhost/sysnomy/flatdetails-test/phpfiles/allotteeDetails.php");
+
             }
         }
     } else {
-
+        echo '<div class="alert alert-danger alert-dismissible fade show" role="alert">
+        <strong>&#10071;</strong>Invalid credintials.
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+        <span aria-hidden="true">×</span>
+        </button>
+        </div>';
 
     }
 
