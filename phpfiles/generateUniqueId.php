@@ -21,4 +21,7 @@ function generateUniqueId($conn, $prefix, $tableName)
     }
 }
 
+// Example usage
+//$uniqueXyzId= generateUniqueId($conn,'xyz_id','table_xyz');
+
 ?>
