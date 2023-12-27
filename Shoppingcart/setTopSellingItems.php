@@ -1,8 +1,16 @@
 <?php
-require '../phpfiles/generateDateTime.php';
-require '../phpfiles/generateUniqueId.php';
+
 require '../phpfiles/insertData.php';
+require '../phpfiles/generateUniqueId.php';
+// require '../phpfiles/db_connect.php';
+
+
 try {
+
+
+    // Start a transaction
+    mysqli_begin_transaction($conn);
+
     if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['selectedColors'])) {
         // Get the color data from the POST request
         $colorData = json_decode($_POST['selectedColors'], true);
@@ -11,8 +19,8 @@ try {
         $product_name = $_POST['product_name'];
         $product_price = $_POST['product_price'];
         $product_image = $_POST['product_image'];
-
-        require '../phpfiles/db_connect.php';
+        $product_size = $_POST['product_size'];
+        echo "Product size is :" . $product_size;
         $productId = generateUniqueId($conn, 'PROD_ID', 'product');
         echo "Prod id is : " . $productId;
 
@@ -61,17 +69,25 @@ try {
 
 
 
-
-
-
-        $productFeatureCategoryId = generateUniqueId($conn, 'PRODFE_CT', 'product_feature_category');
-        echo "Prod feature category id is : " . $productFeatureCategoryId;
-        $insertProductFeatureCategory = array(
-            'PRODUCT_FEATURE_CATEGORY_ID' => $productFeatureCategoryId,
-            'DESCRIPTION' => 'Test'
-
+        $prodFeatureCategoryId = generateUniqueId($conn, 'PROD_FE_CT', 'product_feature_category');
+        echo "Prod feature category id is : " . $prodFeatureCategoryId;
+        $insertProdFeatureCategory = array(
+            'PRODUCT_FEATURE_CATEGORY_ID' => $prodFeatureCategoryId,
+            'DESCRIPTION' => 'Test',
         );
-        insertData("product_feature_category", $insertProductFeatureCategory, $conn);
+        insertData("product_feature_category", $insertProdFeatureCategory, $conn);
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -79,33 +95,70 @@ try {
 
 
         // Insert product feature
-        $productFeatureId = generateUniqueId($conn, 'PROD_FE_', 'product');
-        echo "Prod feature id is : " . $productFeatureId;
+        // $productFeatureId = generateUniqueId($conn, 'PROD_FE_', 'product_feature');
+        // echo "Prod feature id is : " . $productFeatureId;
+        // $insertProductFeature = array(
+        //     'PRODUCT_FEATURE_ID' => $productFeatureId,
+        //     'PRODUCT_FEATURE_TYPE_ID' => 'COLOR',
+        //     'PRODUCT_FEATURE_CATEGORY_ID' => $prodFeatureCategoryId,
+        //     'DESCRIPTION' => 'PRODUCT_VARIANT',
+        //     'FEATURE_VALUE' => json_encode($selectedColors), // Store as JSON in the database
+        //     'UOM_ID' => 'INR'
+        // );
+        // insertData("product_feature", $insertProductFeature, $conn);
 
-        $insertProductFeature = array(
-            'PRODUCT_FEATURE_ID' => $productFeatureId,
-            'PRODUCT_FEATURE_TYPE_ID' => 'COLOR',
-            'PRODUCT_FEATURE_CATEGORY_ID' => $productFeatureCategoryId, //change 'TEXT' to $productFeatureCategoryId
-            'DESCRIPTION' => 'PRODUCT_VARIANT',
-            'COLOR_VALUE' => json_encode($selectedColors), // Store as JSON in the database
-            'UOM_ID' => 'INR'
-        );
-        insertData("product_feature", $insertProductFeature, $conn);
+
+
+
+    
+
+ 
+       
+
+
+
+
+
+
+
+
+
+
+
+
 
         // Insert product feature application
-        $insertProductFeatureAppl = array(
-            'PRODUCT_ID' => $productId,
-            'PRODUCT_FEATURE_ID' => $productFeatureId,
-            'PRODUCT_FEATURE_APPL_TYPE_ID' => 'SELECTABLE_FEATURE'
-        );
-        insertData("product_feature_appl", $insertProductFeatureAppl, $conn);
-        error_log("Insert working properly", 0);
+        // $insertProductFeatureAppl = array(
+        //     'PRODUCT_ID' => $productId,
+        //     'PRODUCT_FEATURE_ID' => $productFeatureId,
+        //     'PRODUCT_FEATURE_APPL_TYPE_ID' => 'SELECTABLE_FEATURE'
+        // );
+        // insertData("product_feature_appl", $insertProductFeatureAppl, $conn);
+
+        // Commit the transaction if everything is successful
+        mysqli_commit($conn);
+        // Display a success message if the product details inserted successfully
+        echo '<div class="alert alert-success alert-dismissible fade show" role="success" id="myAlert">
+     <strong>&#128522;</strong> Product details registered successfully.
+     <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+      <span aria-hidden="true">×</span>
+      </button>
+     </div>';
     }
 } catch (Exception $e) {
+    // An error occurred, roll back the transaction
+    $conn->rollBack();
+
     // Log the exception to a file or print it for debugging
     error_log("Exception: " . $e->getMessage());
-    // You can also log the error to a specific file
-    error_log("Exception: " . $e->getMessage(), 3, "error.log");
+    mysqli_rollback($conn);
+    // Display a error message if the product details is not inserted
+    echo '<div class="alert alert-danger alert-dismissible fade show" role="success" id="myAlert">
+         <strong>&#10071;</strong> There are some technical issue in registering product details.
+         <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+          <span aria-hidden="true">×</span>
+          </button>
+         </div>';
 }
 
 ?>
@@ -127,12 +180,6 @@ try {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Set Top selling items</title>
-    <style>
-        body {
-            /* background-color: #fff6db; */
-        }
-    </style>
-
 </head>
 
 
@@ -141,90 +188,54 @@ try {
     <!-- Display structure of Set top Selling Items   -->
     <div class="container mt-5 white">
         <div class="container-fluid ">
-
             <form action="setTopSellingItems.php" method="post">
                 <div class="row justify-content-center">
                     <h2>Add Top Selling Items Details</h2>
                 </div>
-                <!-- Set product name -->
+                <?php
+                $jsonTopSellingStructure = json_decode('[{"product_name":{"name":"Product name : ","elementName":"product_name","elementIdName":"product_name","elementPlaceHolder":"Enter product name"}},
+                                        {"product_desc":{"name":"Product description : ","elementName":"product_desc","elementIdName":"product_desc","elementPlaceHolder":"Enter product description"}},
+                                        {"product_price":{"name":"Product price : ","elementName":"product_price","elementIdName":"product_price","elementPlaceHolder":"Enter product price"}},
+                                        {"product_image":{"name":"Product image name : ","elementName":"product_image","elementIdName":"product_image","elementPlaceHolder":"Enter product image name"}},
+                                        {"product_colors":{"name":"Select product colors : ","elementName":"colorDropdown","elementIdName":"colorDropdown","elementPlaceHolder":""}},
+                                        {"product_size":{"name":"Enter size of product : ","elementName":"product_size","elementIdName":"product_size","elementPlaceHolder":"Enter product size"}}]');
+                // Counts elements in an array '$jsonSetCategoriesStructure'
+                $itemCount = count($jsonTopSellingStructure);
+                for ($i = 0; $i < $itemCount; $i++) {
+                    // Display two items in one row
+                    if ($i % 2 == 0) {
+                        echo '<div class="row">';
+                    }
+                    echo '<div class="col-md-6">';
+                    $field = $jsonTopSellingStructure[$i];
+                    $formName = key($field);
+                    $formData = current($field);
+                    echo '<div class="form-group">';
+                    echo '<label for="' . $formData->elementName . '">' . $formData->name . '</label>';
+
+                    // Special case for the color dropdown
+                    if ($formData->elementName == "colorDropdown") {
+                        echo '<select id="' . $formData->elementIdName . '" class="js-example-basic-multiple form-control" name="' . $formData->elementName . '" multiple="multiple">';
+                        echo '<option value="" selected disabled>Select color</option>';
+                        echo '<option value="#ff0000" data-color="#ff0000" data-name="Red">Red</option>';
+                        echo '<option value="#00ff00" data-color="#00ff00" data-name="Green">Green</option>';
+                        echo '<option value="#0000ff" data-color="#0000ff" data-name="Blue">Blue</option>';
+                        echo '<option value="#a3381d" data-color="#a3381d" data-name="Brown">Brown</option>';
+                        echo '<option value="#fff6db" data-color="#fff6db" data-name="Light brown">Light brown</option>';
+                        echo '</select>';
+                    } else {
+                        echo '<input type="text" class="form-control" id="' . $formData->elementIdName . '" name="' . $formData->elementName . '" placeholder="' . $formData->elementPlaceHolder . '">';
+                    }
+                    echo '</div>';
+                    echo '</div>';
+                    // Close the row after displaying two items
+                    if ($i % 2 == 1 || $i == $itemCount - 1) {
+                        echo '</div>';
+                    }
+                }
+                ?>
                 <div class="row">
-                    <div class="col-md-6">
-                        <div class="form-group">
-                            <label for="product_name">Product name :</label>
-                            <input type="text" class="form-control" id="product_name" name="product_name"
-                                placeholder="Enter product name">
-                        </div>
-                    </div>
-                    <div class="col-md-6">
-
-                        <div class="form-group">
-                            <label for="product_desc">Product description :</label>
-                            <input type="text" class="form-control" id="product_desc" name="product_desc"
-                                placeholder="Enter product description ">
-                        </div>
-                    </div>
-
-                </div>
-                <!-- Row of color and product image name-->
-                <div class="row">
-                    <!-- Set product color-->
-                    <div class="col-md-6">
-                        <div class="form-group">
-
-                            <input type="hidden" id="selectedColors" name="selectedColors"
-                                value=""><!-- dont remove it -->
-                            <label>Select product colors :</label>
-                            <select id="colorDropdown" class="js-example-basic-multiple form-control"
-                                name="colorDropdown" multiple="multiple">
-                                <option value="" selected disabled>Select color</option>
-                                <option value="#ff0000" data-color="#ff0000" data-name="Red">Red</option>
-                                <option value="#00ff00" data-color="#00ff00" data-name="Green">Green</option>
-                                <option value="#0000ff" data-color="#0000ff" data-name="Blue">Blue</option>
-                                <option value="#a3381d" data-color="#a3381d" data-name="Brown">Brown</option>
-                                <option value="#fff6db" data-color="#fff6db" data-name="Light brown">Light brown
-                                </option>
-                            </select>
-                        </div>
-
-
-
-                    </div>
-
-                    <!-- Set product image name -->
-                    <div class="col-md-6">
-                        <label for="custom-file-input">Product image name :</label>
-                        <div class="">
-                            <div class="custom-file">
-                                <input type="text" class="form-control" id="product_image" name="product_image"
-                                    placeholder="Enter product image name">
-                            </div>
-                        </div>
-                    </div>
-
-                </div>
-
-
-                <!-- Set product price -->
-                <div class="row">
-                    <div class="col-md-6">
-                        <div class="form-group">
-                            <label for="product_price">Product price :</label>
-                            <input type="text" class="form-control" id="product_price" name="product_price"
-                                placeholder="Enter product price">
-                        </div>
-                    </div>
-                    <div class="col-md-6">
-
-
-
-
-
-
-                    </div>
-                </div>
-
-                <div class="row">
-
+                    <input type="" name="selectedColors" id="selectedColors" />
                     <button type="submit" class="btn btn-primary btn success ml-3 mt-2 px-3 py-1">Submit</button>
                 </div>
             </form>
@@ -241,11 +252,7 @@ try {
             </div>
             <div class="row mx-auto my-auto">
                 <?php
-                // $topSellingItemsSql = "SELECT pd.PRODUCT_ID,pd.PRODUCT_NAME,MEDIUM_IMAGE_URL,pp.PRICE
-                // FROM product pd
-                // JOIN product_price pp ON pp.PRODUCT_ID=pd.PRODUCT_ID
-                // WHERE pd.PRODUCT_ID LIKE 'PROD_ID_10%'";
-                $topSellingItemsSql = "SELECT pd.PRODUCT_ID, pd.PRODUCT_NAME, pd.MEDIUM_IMAGE_URL, pp.PRICE, pf.COLOR_VALUE
+                $topSellingItemsSql = "SELECT pd.PRODUCT_ID, pd.PRODUCT_NAME, pd.MEDIUM_IMAGE_URL, pp.PRICE, pf.FEATURE_VALUE
                 FROM product pd
                 JOIN product_price pp ON pp.PRODUCT_ID = pd.PRODUCT_ID
                 JOIN product_feature_appl pfa ON pfa.PRODUCT_ID = pd.PRODUCT_ID
@@ -266,7 +273,7 @@ try {
                             // error_log('Product name is : '.$row['PRODUCT_NAME'], 0);
                             // error_log('Image url is : '.$row['MEDIUM_IMAGE_URL'], 0);
                             // error_log('Product price is : '.$row['PRICE'], 0);
-                            // error_log('Product color is : ' . $row['COLOR_VALUE'], 0);
+                            // error_log('Product color is : ' . $row['FEATURE_VALUE'], 0);
                 
                             echo '<div class="col-md-4 col-12">';
                             echo '<div class="card card-body card-bg-color">';
@@ -279,7 +286,7 @@ try {
                             echo '</div>';
 
                             // Decode the JSON string 
-                            $colorData = json_decode($row['COLOR_VALUE'], true);
+                            $colorData = json_decode($row['FEATURE_VALUE'], true);
                             // Output PRODUCT_ID and $colorData to the JavaScript console
                             // echo '<script>';
                             // echo 'console.log("' . $row['PRODUCT_ID'] . '", ' . json_encode($colorData) . ');';
@@ -293,13 +300,10 @@ try {
                                     echo '<label class="rounded-circle bg-brown mr-1 p-2 border-dark border-2" style="background-color: ' . $color['hexValue'] . ';"></label>';
                                 }
                             }
-
-
                             echo '</div>';
                             echo '</div>';
                         }
                     } else {
-
                         echo '<p>No  items there.</p>';
                     }
                 }
@@ -307,8 +311,6 @@ try {
             </div>
         </div>
     </div>
-
-
 
     <script>
         $(document).ready(function () {
@@ -347,16 +349,12 @@ try {
                     // Update the hidden input value
                     $('#selectedColors').val(JSON.stringify(colorData));
 
-                    // Submit the form
-                    // $('form').submit();
                 }
             }
 
             $('#colorDropdown').on('change', updateColorInput);
-        });
+    });
     </script>
-
-
 </body>
 
 </html>
