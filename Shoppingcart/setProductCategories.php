@@ -1,18 +1,29 @@
 <?php
-require '../phpfiles/generateDateTime.php';
-require '../phpfiles/generateUniqueId.php';
 require '../phpfiles/insertData.php';
+require '../phpfiles/generateUniqueId.php';
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     try {
+        // Start a transaction
+        mysqli_begin_transaction($conn);
         // Get data from POST request
         $category_name = $_POST['category_name'];
         $category_description = $_POST['category_desc'];
         $category_image = $_POST['category_image'];
 
-        // Generate unique IDs
+        // Generate unique 'PRODUCT_STORE_ID'
+        $prodStoreId = generateUniqueId($conn, "STRE_ID", "product_store");
+        echo "Product store id is :" . $prodStoreId;
+        // Insert data into product_store table
+        $insertprodCatalog = array(
+            'PRODUCT_STORE_ID' => $prodStoreId,
+            'PRIMARY_STORE_GROUP_ID' => '_NA_',
+            'STORE_NAME' => 'FARIDABAD STORE 1'
+        );
+        insertData("product_store", $insertprodCatalog, $conn);
+
+        // Generate unique 'PROD_CATALOG_ID'
         $prodCatalogId = generateUniqueId($conn, "PRO_CTLOG", "prod_catalog");
         echo "Prod Catalog id is :" . $prodCatalogId;
-
         // Insert data into prod_catalog table
         $insertprodCatalog = array(
             'PROD_CATALOG_ID' => $prodCatalogId,
@@ -20,10 +31,23 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         );
         insertData("prod_catalog", $insertprodCatalog, $conn);
 
+
+        // Insert data into product_store_catalog table
+        $insertProdStoreCatalog = array(
+            'PRODUCT_STORE_ID' => $prodStoreId,
+            'PROD_CATALOG_ID' => $prodCatalogId,
+            'FROM_DATE' => ''
+        );
+        insertData("product_store_catalog", $insertProdStoreCatalog, $conn);
+
+
+
+        //    include Product categories insert sql
+        // require 'insertProductCategories.php';
+
         // Generate unique product category ID
         $productCategoryId = generateUniqueId($conn, 'PRO_CT_ID', 'product_category');
         echo "Product Category Id is : " . $productCategoryId;
-
         // Insert data into product_category table
         $insertProductCategory = array(
             'PRODUCT_CATEGORY_ID' => $productCategoryId,
@@ -57,11 +81,32 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             'THRU_DATE' => ''
         );
         insertData("product_feature_category_appl", $insertProductFeatureCategoryAppl, $conn);
+
+
+
+        // Commit the transaction if everything is successful
+        mysqli_commit($conn);
+        // Display a success message if the categories details inserted successfully
+        echo '<div class="alert alert-success alert-dismissible fade show" role="success" id="myAlert">
+          <strong>&#128522;</strong> Categories details registered successfully.
+          <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+           <span aria-hidden="true">×</span>
+           </button>
+          </div>';
     } catch (Exception $e) {
-        // Log the error
-        error_log('Error: ' . $e->getMessage());
-        // You can also redirect the user to an error page or show a friendly error message
-        echo 'An error occurred. Please try again later.';
+        // An error occurred, roll back the transaction
+        $conn->rollBack();
+
+        // Log the exception to a file or print it for debugging
+        error_log("Exception: " . $e->getMessage());
+        mysqli_rollback($conn);
+        // Display a error message if the product details is not inserted
+        echo '<div class="alert alert-danger alert-dismissible fade show" role="success" id="myAlert">
+      <strong>&#10071;</strong> There are some technical issue in registering categories details.
+      <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+       <span aria-hidden="true">×</span>
+       </button>
+      </div>';
     }
 }
 ?>
@@ -84,7 +129,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 </head>
 
 <body>
-
     <!-- Display structure of Set top Selling Items   -->
     <div class="container mt-5 white">
         <div class="container-fluid ">
@@ -93,47 +137,42 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                 <div class="row justify-content-center">
                     <h2>Set product categories Details</h2>
                 </div>
-                <!-- Set category name -->
-                <div class="row">
-                    <div class="col-md-6">
-                        <div class="form-group">
-                            <label for="category_name">Category name :</label>
-                            <input type="text" class="form-control" id="category_name" name="category_name"
-                                placeholder="Enter category name">
-                        </div>
-                    </div>
-                    <div class="col-md-6">
 
-                        <div class="form-group">
-                            <label for="category_desc">Category description :</label>
-                            <input type="text" class="form-control" id="category_desc" name="category_desc"
-                                placeholder="Enter category description ">
-                        </div>
-                    </div>
+                <?php
+                $jsonSetCategoriesStructure = json_decode('[{"category_name":{"name":"Category Name : ","elementName":"category_name","elementIdName":"category_name","elementPlaceHolder":"Enter category name"}},
+        {"category_desc":{"name":"Category description : ","elementName":"category_desc","elementIdName":"category_desc","elementPlaceHolder":"Enter category description"}},
+        {"category_image":{"name":"Category image name : ","elementName":"category_image","elementIdName":"category_image","elementPlaceHolder":"Enter category image name"}}
+        ]');
+                // Counts elements in an array '$jsonSetCategoriesStructure'
+                $itemCount = count($jsonSetCategoriesStructure);
+                for ($i = 0; $i < $itemCount; $i++) {
+                    // Display two items in one row
+                    if ($i % 2 == 0) {
+                        echo '<div class="row">';
+                    }
 
-                </div>
-                <!-- Row of  category image name-->
-                <div class="row">
-                    <!-- Set category image name -->
-                    <div class="col-md-6">
-                        <label for="custom-file-input">Category image name :</label>
-                        <div class="">
-                            <div class="custom-file">
-                                <input type="text" class="form-control" id="category_image" name="category_image"
-                                    placeholder="Enter category image name">
-                            </div>
-                        </div>
-                    </div>
-                </div>
+                    echo '<div class="col-md-6">';
+                    $field = $jsonSetCategoriesStructure[$i];
+                    $formName = key($field);
+                    $formData = current($field);
+                    echo '<div class="form-group">';
+                    echo '<label for="' . $formData->elementName . '">' . $formData->name . '</label>';
+                    echo '<input type="text" class="form-control" id="' . $formData->elementIdName . '" name="' . $formData->elementName . '" placeholder=" ' . $formData->elementPlaceHolder . '">';
+                    echo '</div>';
+                    echo '</div>';
 
+                    // Close the row after displaying two items
+                    if ($i % 2 == 1 || $i == $itemCount - 1) {
+                        echo '</div>';
+                    }
+                }
+                ?>
                 <div class="row">
                     <button type="submit" class="btn btn-primary btn success ml-3 mt-2 px-3 py-1">Submit</button>
                 </div>
             </form>
         </div>
     </div>
-
-
 
 
     <!-- Fetch Product Categories -->
@@ -147,11 +186,10 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                 <div class="row mx-auto my-auto">
                     <div id="recipeCarousel" class="carousel slide w-100" data-ride="carousel">
                         <div class="carousel-inner" role="listbox">
-
                             <?php
                             // SQL query to fetch product categories
                             $categorySql = "SELECT PRODUCT_CATEGORY_ID, CATEGORY_NAME, LONG_DESCRIPTION, CATEGORY_IMAGE_URL 
-                    FROM product_category WHERE PRODUCT_CATEGORY_ID LIKE 'PRO_CT_ID00000000007%'";
+                    FROM product_category WHERE PRODUCT_CATEGORY_ID LIKE 'PRO_CT_ID000000000%'";
                             // Execute the query and fetch results
                             $result = mysqli_query($conn, $categorySql);
 
@@ -196,6 +234,10 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                             ?>
                         </div>
 
+
+
+
+
                         <!-- Carousel navigation controls -->
                         <a class="carousel-control-prev w-auto" href="#recipeCarousel" role="button" data-slide="prev">
                             <span class="carousel-control-prev-icon bg-dark border border-dark rounded-circle"
@@ -212,6 +254,11 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             </div> <!-- End Carousel -->
         </div> <!-- End categoriesCollectionContainer -->
     </div><!-- End categoriesCollectionContainer -->
+
+
+
+
+
 
 </body>
 
