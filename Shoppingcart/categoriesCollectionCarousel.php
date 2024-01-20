@@ -3,7 +3,7 @@
 <div class="categoriesCollectionContainer">
     <div class="container-fluid mb-2 border-bottom border-dark">
         <div class="row justify-content-center p-4">
-            <h2 class="h2 categoriesCollectionH2">CATEGORIES COLLECTION</h2>
+        <h2 class="h2 text-nowrap">CATEGORIES COLLECTION</h2>
         </div>
         <!-- Carousel -->
         <div class="container text-center my-3">
@@ -11,9 +11,11 @@
                 <div id="recipeCarousel" class="carousel slide w-100" data-ride="carousel">
                     <div class="carousel-inner" role="listbox">
                         <?php
-                        // SQL query to fetch product categories
-                        $categorySql = "SELECT PRODUCT_CATEGORY_ID, CATEGORY_NAME, LONG_DESCRIPTION, CATEGORY_IMAGE_URL 
-                    FROM product_category WHERE PRODUCT_CATEGORY_ID LIKE 'PRO_CT_ID00000000007%'";
+
+                        $categorySql = "SELECT pcc.PROD_CATALOG_ID,pc.PRODUCT_CATEGORY_ID ,pc.CATEGORY_NAME,pc.CATEGORY_IMAGE_URL
+                        FROM product_category  pc
+                        JOIN prod_catalog_category pcc ON pcc.PRODUCT_CATEGORY_ID = pc.PRODUCT_CATEGORY_ID
+                        WHERE pcc.PROD_CATALOG_ID='ShoesCatalog'";
                         // Execute the query and fetch results
                         $result = mysqli_query($conn, $categorySql);
                         // Check if there's an error with the query
@@ -38,8 +40,8 @@
                                         $row = mysqli_fetch_assoc($result);
                                         if ($row) {
                                             echo '<div class="col-md-4 col-12">';
-                                            echo '<div class="card card-body card-bg-color">';
-                                            echo '<img class="img-fluid card-bg-color" src="img/categories-img/' . $row['CATEGORY_IMAGE_URL'] . '">';
+                                            echo '<div class="card card-body h-100">';
+                                            echo '<img class="img-fluid card-bg-color" style="object-fit: cover; height: 100%;" src="img/categories-img/' . $row['CATEGORY_IMAGE_URL'] . '">';
                                             echo '<button class="btn btn-dark">' . $row['CATEGORY_NAME'] . '</button>';
                                             echo '</div>';
                                             echo '</div>';

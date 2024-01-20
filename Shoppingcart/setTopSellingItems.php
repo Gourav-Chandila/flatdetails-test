@@ -2,164 +2,191 @@
 
 require '../phpfiles/insertData.php';
 require '../phpfiles/generateUniqueId.php';
-// require '../phpfiles/db_connect.php';
+
+if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['selectedColors'])) {
+    // Get the color data from the POST request
+    $selectedColors = $_POST['selectedColors'];
+    echo $selectedColors;
+    // Get user input from the form (outside the foreach loop)
+    $product_name = $_POST['product_name'];
+    $product_price = $_POST['product_price'];
+    $product_image = $_POST['product_image'];
+    $selectedSizes = $_POST['selectedSize'];
+    echo $selectedSizes;
+
+    $productId = generateUniqueId($conn, 'PROD_ID', 'product');
+    // echo "Prod id is : " . $productId;
 
 
-try {
+    // Insert product details
+    $insertProductDetails = array(
+        'PRODUCT_ID' => $productId,
+        'PRODUCT_NAME' => $product_name,
+        'PRODUCT_TYPE_ID' => 'FINISHED_GOOD',
+        'PRIMARY_PRODUCT_CATEGORY_ID' => 'SHOES',
+        'MEDIUM_IMAGE_URL' => $product_image,
+        'IS_VIRTUAL' => 'N',
+        'IS_VARIANT' => 'N'
+    );
+    insertData("product", $insertProductDetails, $conn);
+
+    // Insert product price
+    $insertProductPrice = array(
+        'PRODUCT_ID' => $productId,
+        'PRODUCT_PRICE_TYPE_ID' => 'DEFAULT_PRICE',
+        'PRODUCT_PRICE_PURPOSE_ID' => 'PURCHASE',
+        'CURRENCY_UOM_ID' => 'INR',
+        'PRODUCT_STORE_GROUP_ID' => '_NA_',
+        'PRICE' => $product_price
+    );
+    insertData("product_price", $insertProductPrice, $conn);
+
+    // Insert product association
+    $insertProductAssoc = array(
+        'PRODUCT_ID' => $productId,
+        'PRODUCT_ASSOC_TYPE_ID' => 'PRODUCT_VARIANT'
+    );
+    insertData("product_assoc", $insertProductAssoc, $conn);
 
 
-    // Start a transaction
-    mysqli_begin_transaction($conn);
 
-    if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['selectedColors'])) {
-        // Get the color data from the POST request
-        $colorData = json_decode($_POST['selectedColors'], true);
+    $prodFeatureCategoryId = generateUniqueId($conn, 'PROD_FE_CT', 'product_feature_category');
+    // echo "Prod feature category id is : " . $prodFeatureCategoryId;
+    $insertProdFeatureCategory = array(
+        'PRODUCT_FEATURE_CATEGORY_ID' => $prodFeatureCategoryId,
+        'DESCRIPTION' => 'Test',
+    );
+    insertData("product_feature_category", $insertProdFeatureCategory, $conn);
 
-        // Get user input from the form (outside the foreach loop)
-        $product_name = $_POST['product_name'];
-        $product_price = $_POST['product_price'];
-        $product_image = $_POST['product_image'];
-        $product_size = $_POST['product_size'];
-        echo "Product size is :" . $product_size;
-        $productId = generateUniqueId($conn, 'PROD_ID', 'product');
-        echo "Prod id is : " . $productId;
 
-        // Collect all selected colors in an array
-        $selectedColors = [];
-        // it takes color name with its hex value and store in array
-        foreach ($colorData as $color) {
-            $colorName = $color['name'];
-            $hexValue = $color['value'];
 
-            $selectedColors[] = [
-                'colorName' => $colorName,
-                'hexValue' => $hexValue
-            ];
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    // Array to store product feature IDs
+    $productFeatureIds = [];
+    // if (!empty($product_size)) {
+    //     // Insert product feature for size
+    //     $productFeatureId = generateUniqueId($conn, 'PROD_FE_', 'product_feature');
+    //     echo "<br>Prod feature id for size is : " . $productFeatureId;
+    //     $insertProductFeature = array(
+    //         'PRODUCT_FEATURE_ID' => $productFeatureId,
+    //         'PRODUCT_FEATURE_TYPE_ID' => 'SIZE',
+    //         'PRODUCT_FEATURE_CATEGORY_ID' => $prodFeatureCategoryId,
+    //         'DESCRIPTION' => $product_size,
+    //         'UOM_ID' => 'INR'
+    //     );
+    //     insertData("product_feature", $insertProductFeature, $conn);
+    //     // Add the product feature ID to the array
+    //     $productFeatureIds[] = $productFeatureId;
+    // }
+
+
+    if (!empty($selectedSizes)) {
+        // Split selected colors into an array
+        $sizesArray = explode(',', $selectedSizes);
+
+        // Loop through each color
+        foreach ($sizesArray as $size) {
+            // Insert product feature for each color
+            $productFeatureId = generateUniqueId($conn, 'PROD_FE_', 'product_feature');
+            echo "<br>Prod feature id for color is: " . $productFeatureId;
+
+            // Extract hex value from the color
+            $sizeValue = $size;
+
+            // Insert product feature data
+            $insertProductFeature = array(
+                'PRODUCT_FEATURE_ID' => $productFeatureId,
+                'PRODUCT_FEATURE_TYPE_ID' => 'SIZE',
+                'PRODUCT_FEATURE_CATEGORY_ID' => $prodFeatureCategoryId,
+                'DESCRIPTION' => $sizeValue,
+                'UOM_ID' => 'INR'
+            );
+
+            // Insert data into the database
+            insertData("product_feature", $insertProductFeature, $conn);
+
+            // Add the product feature ID to the array
+            $productFeatureIds[] = $productFeatureId;
         }
+    }
 
-        // Insert product details
-        $insertProductDetails = array(
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    if (!empty($selectedColors)) {
+        // Split selected colors into an array
+        $colorsArray = explode(',', $selectedColors);
+
+        // Loop through each color
+        foreach ($colorsArray as $color) {
+            // Insert product feature for each color
+            $productFeatureId = generateUniqueId($conn, 'PROD_FE_', 'product_feature');
+            echo "<br>Prod feature id for color is: " . $productFeatureId;
+
+            // Extract hex value from the color
+            $hexValue = $color;
+
+            // Insert product feature data
+            $insertProductFeature = array(
+                'PRODUCT_FEATURE_ID' => $productFeatureId,
+                'PRODUCT_FEATURE_TYPE_ID' => 'COLOR',
+                'PRODUCT_FEATURE_CATEGORY_ID' => $prodFeatureCategoryId,
+                'DESCRIPTION' => $hexValue,
+                'UOM_ID' => 'INR'
+            );
+
+            // Insert data into the database
+            insertData("product_feature", $insertProductFeature, $conn);
+
+            // Add the product feature ID to the array
+            $productFeatureIds[] = $productFeatureId;
+        }
+    }
+
+    // Insert product feature applications if there are feature IDs
+    foreach ($productFeatureIds as $featureId) {
+        $insertProductFeatureAppl = array(
             'PRODUCT_ID' => $productId,
-            'PRODUCT_NAME' => $product_name,
-            'PRODUCT_TYPE_ID' => 'FINISHED_GOOD',
-            'PRIMARY_PRODUCT_CATEGORY_ID' => 'SHOES',
-            'MEDIUM_IMAGE_URL' => $product_image,
-            'IS_VIRTUAL' => 'N',
-            'IS_VARIANT' => 'N'
+            'PRODUCT_FEATURE_ID' => $featureId,
+            'PRODUCT_FEATURE_APPL_TYPE_ID' => 'SELECTABLE_FEATURE'
         );
-        insertData("product", $insertProductDetails, $conn);
+        insertData("product_feature_appl", $insertProductFeatureAppl, $conn);
+    }
 
-        // Insert product price
-        $insertProductPrice = array(
-            'PRODUCT_ID' => $productId,
-            'PRODUCT_PRICE_TYPE_ID' => 'DEFAULT_PRICE',
-            'PRODUCT_PRICE_PURPOSE_ID' => 'PURCHASE',
-            'CURRENCY_UOM_ID' => 'INR',
-            'PRODUCT_STORE_GROUP_ID' => '_NA_',
-            'PRICE' => $product_price
-        );
-        insertData("product_price", $insertProductPrice, $conn);
-
-        // Insert product association
-        $insertProductAssoc = array(
-            'PRODUCT_ID' => $productId,
-            'PRODUCT_ASSOC_TYPE_ID' => 'PRODUCT_VARIANT'
-        );
-        insertData("product_assoc", $insertProductAssoc, $conn);
-
-
-
-        $prodFeatureCategoryId = generateUniqueId($conn, 'PROD_FE_CT', 'product_feature_category');
-        echo "Prod feature category id is : " . $prodFeatureCategoryId;
-        $insertProdFeatureCategory = array(
-            'PRODUCT_FEATURE_CATEGORY_ID' => $prodFeatureCategoryId,
-            'DESCRIPTION' => 'Test',
-        );
-        insertData("product_feature_category", $insertProdFeatureCategory, $conn);
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-        // Insert product feature
-        // $productFeatureId = generateUniqueId($conn, 'PROD_FE_', 'product_feature');
-        // echo "Prod feature id is : " . $productFeatureId;
-        // $insertProductFeature = array(
-        //     'PRODUCT_FEATURE_ID' => $productFeatureId,
-        //     'PRODUCT_FEATURE_TYPE_ID' => 'COLOR',
-        //     'PRODUCT_FEATURE_CATEGORY_ID' => $prodFeatureCategoryId,
-        //     'DESCRIPTION' => 'PRODUCT_VARIANT',
-        //     'FEATURE_VALUE' => json_encode($selectedColors), // Store as JSON in the database
-        //     'UOM_ID' => 'INR'
-        // );
-        // insertData("product_feature", $insertProductFeature, $conn);
-
-
-
-
-    
-
- 
-       
-
-
-
-
-
-
-
-
-
-
-
-
-
-        // Insert product feature application
-        // $insertProductFeatureAppl = array(
-        //     'PRODUCT_ID' => $productId,
-        //     'PRODUCT_FEATURE_ID' => $productFeatureId,
-        //     'PRODUCT_FEATURE_APPL_TYPE_ID' => 'SELECTABLE_FEATURE'
-        // );
-        // insertData("product_feature_appl", $insertProductFeatureAppl, $conn);
-
-        // Commit the transaction if everything is successful
-        mysqli_commit($conn);
-        // Display a success message if the product details inserted successfully
-        echo '<div class="alert alert-success alert-dismissible fade show" role="success" id="myAlert">
+    // Commit the transaction if everything is successful
+    // Display a success message if the product details inserted successfully
+    echo '<div class="alert alert-success alert-dismissible fade show" role="success" id="myAlert">
      <strong>&#128522;</strong> Product details registered successfully.
      <button type="button" class="close" data-dismiss="alert" aria-label="Close">
       <span aria-hidden="true">×</span>
       </button>
      </div>';
-    }
-} catch (Exception $e) {
-    // An error occurred, roll back the transaction
-    $conn->rollBack();
-
-    // Log the exception to a file or print it for debugging
-    error_log("Exception: " . $e->getMessage());
-    mysqli_rollback($conn);
-    // Display a error message if the product details is not inserted
-    echo '<div class="alert alert-danger alert-dismissible fade show" role="success" id="myAlert">
-         <strong>&#10071;</strong> There are some technical issue in registering product details.
-         <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-          <span aria-hidden="true">×</span>
-          </button>
-         </div>';
 }
+
 
 ?>
 <!DOCTYPE html>
@@ -194,11 +221,16 @@ try {
                 </div>
                 <?php
                 $jsonTopSellingStructure = json_decode('[{"product_name":{"name":"Product name : ","elementName":"product_name","elementIdName":"product_name","elementPlaceHolder":"Enter product name"}},
-                                        {"product_desc":{"name":"Product description : ","elementName":"product_desc","elementIdName":"product_desc","elementPlaceHolder":"Enter product description"}},
-                                        {"product_price":{"name":"Product price : ","elementName":"product_price","elementIdName":"product_price","elementPlaceHolder":"Enter product price"}},
-                                        {"product_image":{"name":"Product image name : ","elementName":"product_image","elementIdName":"product_image","elementPlaceHolder":"Enter product image name"}},
-                                        {"product_colors":{"name":"Select product colors : ","elementName":"colorDropdown","elementIdName":"colorDropdown","elementPlaceHolder":""}},
-                                        {"product_size":{"name":"Enter size of product : ","elementName":"product_size","elementIdName":"product_size","elementPlaceHolder":"Enter product size"}}]');
+    {"product_desc":{"name":"Product description : ","elementName":"product_desc","elementIdName":"product_desc","elementPlaceHolder":"Enter product description"}},
+    {"product_price":{"name":"Product price : ","elementName":"product_price","elementIdName":"product_price","elementPlaceHolder":"Enter product price"}},
+    {"product_image":{"name":"Product image name : ","elementName":"product_image","elementIdName":"product_image","elementPlaceHolder":"Enter product image name"}},
+                                {"product_colors":{"name":"Select product colors : ","elementName":"colorDropdown","elementIdName":"colorDropdown","options":[{"value":"#ff0000","data_name":"Red"},{"value":"#00ff00","data_name":"Green"},{"value":"#0000ff","data_name":"Blue"},{"value":"#a3381d","data_name":"Brown"},{"value":"#fff6db","data_name":"Light brown"}]}},
+                                {"product_sizes":{"name":"Select product sizes : ","elementName":"sizeDropdown","elementIdName":"sizeDropdown","options":[{"value":"7","data_name":"7"},{"value":"8","data_name":"8"},{"value":"9","data_name":"9"},{"value":"10","data_name":"10"}]}}
+                        
+                            ]');
+                            $productColorsImage = array(
+                                '#fff6db' => 'menFormalSlipOnShoesBrown.jpg',
+                            );
                 // Counts elements in an array '$jsonSetCategoriesStructure'
                 $itemCount = count($jsonTopSellingStructure);
                 for ($i = 0; $i < $itemCount; $i++) {
@@ -213,15 +245,13 @@ try {
                     echo '<div class="form-group">';
                     echo '<label for="' . $formData->elementName . '">' . $formData->name . '</label>';
 
-                    // Special case for the color dropdown
-                    if ($formData->elementName == "colorDropdown") {
+                    // Special case for the color and size dropdowns
+                    if ($formData->elementName == "colorDropdown" || $formData->elementName == "sizeDropdown") {
                         echo '<select id="' . $formData->elementIdName . '" class="js-example-basic-multiple form-control" name="' . $formData->elementName . '" multiple="multiple">';
-                        echo '<option value="" selected disabled>Select color</option>';
-                        echo '<option value="#ff0000" data-color="#ff0000" data-name="Red">Red</option>';
-                        echo '<option value="#00ff00" data-color="#00ff00" data-name="Green">Green</option>';
-                        echo '<option value="#0000ff" data-color="#0000ff" data-name="Blue">Blue</option>';
-                        echo '<option value="#a3381d" data-color="#a3381d" data-name="Brown">Brown</option>';
-                        echo '<option value="#fff6db" data-color="#fff6db" data-name="Light brown">Light brown</option>';
+                        // Add options dynamically based on data
+                        foreach ($formData->options as $option) {
+                            echo '<option value="' . $option->value . '" data-color="' . $option->value . '">' . $option->data_name . '</option>';
+                        }
                         echo '</select>';
                     } else {
                         echo '<input type="text" class="form-control" id="' . $formData->elementIdName . '" name="' . $formData->elementName . '" placeholder="' . $formData->elementPlaceHolder . '">';
@@ -235,9 +265,19 @@ try {
                 }
                 ?>
                 <div class="row">
-                    <input type="" name="selectedColors" id="selectedColors" />
-                    <button type="submit" class="btn btn-primary btn success ml-3 mt-2 px-3 py-1">Submit</button>
+                    <div class="col-md-6">
+                        <label for="selectedColors">Selected colors :</label>
+                        <input type="" name="selectedColors" id="selectedColors" />
+                    </div>
+                    <div class="col-md-6">
+                        <label for="selectedSize">Selected sizes :</label>
+                        <input type="" name="selectedSize" id="selectedSize" />
+                    </div>
                 </div>
+                <div class="row">
+                    
+                </div>
+                <button type="submit" class="btn btn-primary btn success ml-3 mt-2 px-3 py-1">Submit</button>
             </form>
         </div>
     </div>
@@ -252,12 +292,19 @@ try {
             </div>
             <div class="row mx-auto my-auto">
                 <?php
-                $topSellingItemsSql = "SELECT pd.PRODUCT_ID, pd.PRODUCT_NAME, pd.MEDIUM_IMAGE_URL, pp.PRICE, pf.FEATURE_VALUE
-                FROM product pd
-                JOIN product_price pp ON pp.PRODUCT_ID = pd.PRODUCT_ID
-                JOIN product_feature_appl pfa ON pfa.PRODUCT_ID = pd.PRODUCT_ID
-                JOIN product_feature pf ON pf.PRODUCT_FEATURE_ID = pfa.PRODUCT_FEATURE_ID   
-                WHERE pd.PRODUCT_ID LIKE 'PROD_ID%' AND pf.PRODUCT_FEATURE_TYPE_ID = 'COLOR';";
+                $topSellingItemsSql = "SELECT
+                        pd.PRODUCT_ID,
+                        pd.PRODUCT_NAME,
+                        pd.MEDIUM_IMAGE_URL,
+                        pp.PRICE,
+                        GROUP_CONCAT(pf.DESCRIPTION) AS COLORS
+                    FROM product pd
+                    JOIN product_price pp ON pp.PRODUCT_ID = pd.PRODUCT_ID
+                    LEFT JOIN product_feature_appl pfa ON pfa.PRODUCT_ID = pd.PRODUCT_ID
+                    LEFT JOIN product_feature pf ON pf.PRODUCT_FEATURE_ID = pfa.PRODUCT_FEATURE_ID
+                    WHERE pd.PRODUCT_ID LIKE 'PROD_ID%' AND pf.PRODUCT_FEATURE_ID LIKE 'PROD_FE%'
+                        AND (pf.PRODUCT_FEATURE_TYPE_ID = 'COLOR')
+                    GROUP BY pd.PRODUCT_ID";
                 // Execute the query and fetch results
                 $result = mysqli_query($conn, $topSellingItemsSql);
 
@@ -272,9 +319,7 @@ try {
                             // error_log('Product id is : '.$row['PRODUCT_ID'], 0);
                             // error_log('Product name is : '.$row['PRODUCT_NAME'], 0);
                             // error_log('Image url is : '.$row['MEDIUM_IMAGE_URL'], 0);
-                            // error_log('Product price is : '.$row['PRICE'], 0);
-                            // error_log('Product color is : ' . $row['FEATURE_VALUE'], 0);
-                
+                            // error_log('Product price is : '.$row['PRICE'], 0);                
                             echo '<div class="col-md-4 col-12">';
                             echo '<div class="card card-body card-bg-color">';
                             echo '<img class="img-fluid card-bg-color" src="img/top-selling-items/' . $row['MEDIUM_IMAGE_URL'] . '">';
@@ -284,33 +329,30 @@ try {
                             echo '<div class="roundedProductPriceLabel text-dark">';
                             echo '<span>&#8377;' . $row['PRICE'] . '</span>';
                             echo '</div>';
+                            // Explode the COLORS string
+                            $hexValues = explode(',', $row['COLORS']);
 
-                            // Decode the JSON string 
-                            $colorData = json_decode($row['FEATURE_VALUE'], true);
-                            // Output PRODUCT_ID and $colorData to the JavaScript console
-                            // echo '<script>';
-                            // echo 'console.log("' . $row['PRODUCT_ID'] . '", ' . json_encode($colorData) . ');';
-                            // echo '</script>';
-                            // Display hex values if $colorData is not null
-                            if ($colorData !== null) {
-                                foreach ($colorData as $color) {
-                                    // Log the hex value to check if it's correct
-                                    // error_log('Color name is : ' . $color['colorName'] . ' and ' . 'Hex value is : ' . $color['hexValue'], 0);
-                                    // Output the label with the correct background color
-                                    echo '<label class="rounded-circle bg-brown mr-1 p-2 border-dark border-2" style="background-color: ' . $color['hexValue'] . ';"></label>';
-                                }
+                            // Loop through each color
+                            foreach ($hexValues as $color) {
+                                echo '<label class="rounded-circle bg-brown mr-1 p-2 border-dark border-2" style="background-color: ' . $color . ';"></label>';
                             }
+
                             echo '</div>';
                             echo '</div>';
                         }
                     } else {
-                        echo '<p>No  items there.</p>';
+                        echo '<div class="container">
+                    <div class="row justify-content-center">
+                    <h6>No items there</h4>
+                    </div>
+                    </div>';
                     }
                 }
                 ?>
             </div>
         </div>
     </div>
+
 
     <script>
         $(document).ready(function () {
@@ -322,6 +364,7 @@ try {
                 }
             });
 
+            //This shows rounded bg color 
             function formatColor(state) {
                 if (!state.id) {
                     return state.text;
@@ -338,23 +381,39 @@ try {
             function updateColorInput() {
                 var selectedColors = $('#colorDropdown').val();
 
+                // Log selected colors before updating the hidden input
+                // console.log('Selected Colors before update: ', selectedColors);
+
                 if (selectedColors && selectedColors.length > 0) {
-                    var colorData = selectedColors.map(function (color) {
-                        var option = $('#colorDropdown option[value="' + color + '"]');
-                        var hexValue = option.data('color');
-                        var colorName = option.data('name');
-                        return { name: colorName, value: hexValue };
-                    });
+                    // Update the hidden input value with JSON-encoded string
+                    $('#selectedColors').val(selectedColors);
 
-                    // Update the hidden input value
-                    $('#selectedColors').val(JSON.stringify(colorData));
+                    // Log the updated hidden input value
+                    // console.log('Updated Hidden Input Value: ', selectedColors);
+                }
+            }
 
+
+            function updateSizeInput() {
+                var selectedSize = $('#sizeDropdown').val();
+
+                // Log selected colors before updating the hidden input
+                // console.log('Selected Colors before update: ', selectedSize);
+
+                if (selectedSize && selectedSize.length > 0) {
+
+                    $('#selectedSize').val(selectedSize);
+
+                    // Log the updated hidden input value
+                    // console.log('Updated Hidden Input Value: ', selectedSize);
                 }
             }
 
             $('#colorDropdown').on('change', updateColorInput);
-    });
+            $('#sizeDropdown').on('change', updateSizeInput);
+        });
     </script>
+
 </body>
 
 </html>

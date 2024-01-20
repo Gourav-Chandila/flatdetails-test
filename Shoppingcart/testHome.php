@@ -12,7 +12,7 @@
     <link rel="stylesheet" type="text/css" href="../css/style.css">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Home Page</title>
+    <title>test Home Page</title>
 </head>
 
 <body class="">
@@ -30,16 +30,18 @@
                 Select category
             </button>
             <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-                <a class="dropdown-item" href="menCategories.php">Men</a>
-                <a class="dropdown-item" href="womenCategories.php">Women</a>
+
+                <a class="dropdown-item" href="categories.php?for=MN_SH%">Men</a>
+                <a class="dropdown-item" href="categories.php?for=W_SH_%">Women</a>
+
             </div>
         </div>
     </div>
 
-        <!-- shows categories Carousel -->
-        <?php require 'categoriesCollectionCarousel.php' ?>
+    <!-- shows categories Carousel -->
+    <?php require 'categoriesCollectionCarousel.php' ?>
 
-        
+
     <!-- shows topSellingItems -->
     <?php require 'topSellingItems.php' ?>
 
