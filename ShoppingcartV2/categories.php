@@ -12,16 +12,16 @@
     <link rel="stylesheet" type="text/css" href="../css/style.css">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Categories</title>
+    <title>
+        <?php echo htmlspecialchars($_GET['type']) . " " . "Category"; ?>
+    </title>
 </head>
 
 
 <body>
 
-    <!-- including navbar -->
-    <?php require '../phpfiles/navbar.php' ?>
-
     <div class="categoriesCollectionContainer">
+        <?php require '../phpfiles/navbar.php' ?>
         <div class="container-fluid mb-2 border-bottom border-dark">
             <div class="row justify-content-center my-5 p-4">
                 <h2 class="h2 categoriesCollectionH2">CATEGORIES COLLECTION</h2>
@@ -37,22 +37,11 @@
                             // Get the for name from the URL parameter, default to 'men' if not specified
                             $for = isset($_GET['for']) ? $_GET['for'] : 'MN_SH';
 
-                            // Define the category-specific SQL query
-                            $categorySql = "";
-                            if ($for === 'MN_SH') {
-                                $categorySql = "SELECT pcc.PROD_CATALOG_ID, pc.PRODUCT_CATEGORY_ID, pc.CATEGORY_NAME, pc.CATEGORY_IMAGE_URL
-                                              FROM product_category pc
-                                              JOIN prod_catalog_category pcc ON pcc.PRODUCT_CATEGORY_ID = pc.PRODUCT_CATEGORY_ID
-                                              WHERE pcc.PROD_CATALOG_ID = 'ShoesCatalog' AND pc.PRODUCT_CATEGORY_ID LIKE '$for%'";
-                            } elseif ($for === 'W_SH') {
-                                // Adjust the query for women's categories
-                                $categorySql = "SELECT pcc.PROD_CATALOG_ID, pc.PRODUCT_CATEGORY_ID, pc.CATEGORY_NAME, pc.CATEGORY_IMAGE_URL
-                                              FROM product_category pc
-                                              JOIN prod_catalog_category pcc ON pcc.PRODUCT_CATEGORY_ID = pc.PRODUCT_CATEGORY_ID
-                                              WHERE pcc.PROD_CATALOG_ID = 'ShoesCatalog' AND pc.PRODUCT_CATEGORY_ID LIKE '$for%'";
-                            } else {
+                            $categorySql = "SELECT pcc.PROD_CATALOG_ID, pc.PRODUCT_CATEGORY_ID, pc.CATEGORY_NAME, pc.CATEGORY_IMAGE_URL
+                                            FROM product_category pc
+                                            JOIN prod_catalog_category pcc ON pcc.PRODUCT_CATEGORY_ID = pc.PRODUCT_CATEGORY_ID
+                                            WHERE pcc.PROD_CATALOG_ID = 'ShoesCatalog' AND pc.PRODUCT_CATEGORY_ID LIKE '$for%'";
 
-                            }
                             // Execute the query and fetch results
                             $result = mysqli_query($conn, $categorySql);
 
@@ -80,41 +69,22 @@
                                                 echo '<div class="col-md-4 col-12">';
                                                 echo '<div class="card card-body h-100">';
                                                 //show men category image if for == MN_SH_FR_% else show women category image 
-                                                if ($for === 'MN_SH') {
-                                                    echo '<img class="img-fluid" style="object-fit: cover; height: 100%;" src="img/categories-img/menCategoriesImgs/' . $row['CATEGORY_IMAGE_URL'] . '">';
-                                                } else {
-                                                    echo '<img class="img-fluid" style="object-fit: cover; height: 100%;" src="img/categories-img/womenCategoriesImgs/' . $row['CATEGORY_IMAGE_URL'] . '">';
-                                                }
+                                                $categoryPath = ($for === 'MN_SH') ? 'menCategoriesImgs/' : 'womenCategoriesImgs/';
+                                                echo '<img class="img-fluid" style="object-fit: cover; height: 100%;" src="img/categories-img/' . $categoryPath . $row['CATEGORY_IMAGE_URL'] . '">';
 
-                                                // if ($row['CATEGORY_NAME'] === 'Men formal shoes' && $_GET['type'] === 'men' || $row['CATEGORY_NAME'] === 'Women formal shoes' && $_GET['type'] === 'women') {
-                                                //     if ($_GET['type'] == 'men') {
-                                                //         $forValue = 'MN_SH_FR';
-                                                //         echo '<a class="btn btn-dark" href="Shoes.php?for=' . $forValue . '">' . $row['CATEGORY_NAME'] . '</a>';
-                                                //     } else {
-                                                //         $forValue = 'W_SH_FR';
-                                                //         echo '<a class="btn btn-dark" href="Shoes.php?for=' . $forValue . '">' . $row['CATEGORY_NAME'] . '</a>';
-                                                //     }
-                            
-                                                // } 
+                                                //checks category type from url parameter than show category men or women
                                                 if (($row['CATEGORY_NAME'] === 'Men formal shoes' && $_GET['type'] === 'men') || ($row['CATEGORY_NAME'] === 'Women formal shoes' && $_GET['type'] === 'women')) {
                                                     $forValue = ($_GET['type'] === 'men') ? 'MN_SH_FR' : 'W_SH_FR';
-                                                    echo '<a class="btn btn-dark" href="Shoes.php?for=' . $forValue . '">' . $row['CATEGORY_NAME'] . '</a>';
+                                                    //set the category name in url using url encode
+                                                    echo '<a class="btn btn-dark" href="show_products.php?for=' . $forValue . '">' . $row['CATEGORY_NAME'] . '</a>';
+
                                                 } else {
-                                                    // if ($_GET['type'] == 'men') {
-                                                    //     $forValue = 'MN_SH_SP';
-                                                    //     echo '<a class="btn btn-dark" href="Shoes.php?for=' . $forValue . '">' . $row['CATEGORY_NAME'] . '</a>';
-                                                    // } else {
-                                                    //     $forValue = 'W_SH_SP';
-                                                    //     echo '<a class="btn btn-dark" href="Shoes.php?for=' . $forValue . '">' . $row['CATEGORY_NAME'] . '</a>';
-                                                    // }
+                                                    //set the category name in url using url encode
                                                     $forValue = ($_GET['type'] == 'men') ? 'MN_SH_SP' : 'W_SH_SP';
-                                                    echo '<a class="btn btn-dark" href="Shoes.php?for=' . $forValue . '">' . $row['CATEGORY_NAME'] . '</a>';
-
+                                                    echo '<a class="btn btn-dark" href="show_products.php?for=' . $forValue . '">' . $row['CATEGORY_NAME'] . '</a>';
                                                 }
-
                                                 echo '</div>';
                                                 echo '</div>';
-
                                             }
                                         }
 

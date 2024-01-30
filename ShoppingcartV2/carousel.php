@@ -11,10 +11,9 @@
         foreach ($jsonCarousel as $carouselItem) {
             $cardData = reset($carouselItem);
             $carouselStatus = $cardData->carouselStatus;
-
-            echo '<div class="carousel-item ' . $carouselStatus . '">';
-            echo '<img src="img/carosuel-img/' . $cardData->carouselImageName . '" class="d-block w-100" alt="...">';
-            echo '</div>';
+            echo '<div class="carousel-item ' . $carouselStatus . '">
+            <img src="img/carosuel-img/' . $cardData->carouselImageName . '" class="d-block w-100" alt="...">
+            </div>';
         }
         ?>
     </div>

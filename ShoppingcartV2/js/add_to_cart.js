@@ -7,6 +7,7 @@ function addToCart(index) {
 
     // Create an object representing the selected product
     var selectedProduct = {
+        product_id_to: selectedSize.product_id_to,
         productImage: selectedSize.productImage,
         productName: document.getElementById(`productName${index}`).innerText,
         size: selectedSize.element.innerText,
@@ -28,13 +29,15 @@ function addToCart(index) {
     // Send an AJAX request to update cartCount and selectedProducts on the server
     $.ajax({
         type: 'POST',
-        url: 'updateCartCount.php',
+        url: 'update_cart_count.php',
         data: {
             cartCount: cartCount,
             selectedProducts: JSON.stringify(selectedProducts)
         },
         success: function (response) {
             console.log('Cart count and selected products updated on the server.');
+            console.log('Working', JSON.stringify(selectedProducts));
+
         },
         error: function (error) {
             console.error('Error updating cart count and selected products:', error);
@@ -42,4 +45,5 @@ function addToCart(index) {
     });
 
     console.log(`Product at card index ${index} added to the cart.`);
+    return selectedSize.product_id_to;
 }

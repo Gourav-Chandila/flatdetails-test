@@ -30,18 +30,17 @@
                 Select category
             </button>
             <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-                <a class="dropdown-item" href="menCategories.php">Men</a>
-                <a class="dropdown-item" href="womenCategories.php">Women</a>
+                <a class="dropdown-item" href="categories.php?for=MN_SH&type=men">Men</a>
+                <a class="dropdown-item" href="categories.php?for=W_SH&type=women">Women</a>
             </div>
         </div>
     </div>
 
-        <!-- shows categories Carousel -->
-        <?php require 'categoriesCollectionCarousel.php' ?>
+    <!-- shows categories Carousel -->
+    <?php require 'categories_collection_carousel.php' ?>
 
-        
     <!-- shows topSellingItems -->
-    <?php require 'topSellingItems.php' ?>
+    <?php require 'top_selling_items.php' ?>
 
     <?php require '../phpfiles/footer.php' ?>
 

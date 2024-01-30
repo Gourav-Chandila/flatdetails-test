@@ -1,6 +1,4 @@
 <?php
-// Include the database connection file
-
 function getProductJson($productAssocProductId)
 {
     require '../phpfiles/db_connect.php';
@@ -12,7 +10,6 @@ function getProductJson($productAssocProductId)
         LEFT JOIN product_feature_appl pfa ON pa.PRODUCT_ID_TO = pfa.PRODUCT_ID
         WHERE pa.PRODUCT_ID LIKE '$productAssocProductId'
         ";
-
     $Result = mysqli_query($conn, $Sql);
 
     // Check if there's an error with the query
@@ -23,29 +20,27 @@ function getProductJson($productAssocProductId)
             $relatedProductID = $Row['PRODUCT_ID_TO'];
             $standardFeatureID = $Row['standard_feature_id'];
 
-            // Fetch additional information from the product_feature table for standard feature
-            $standardFeatureSql = "SELECT pa.PRODUCT_ID, pf.PRODUCT_FEATURE_ID, pf.DESCRIPTION, pf.PRODUCT_FEATURE_TYPE_ID, p.MEDIUM_IMAGE_URL, pp.PRICE, p.PRODUCT_NAME, p.IS_VIRTUAL
-          FROM product_assoc pa
-          LEFT JOIN product_feature_appl pfa ON pfa.PRODUCT_ID = pa.PRODUCT_ID
-          LEFT JOIN product_feature pf ON pfa.PRODUCT_FEATURE_ID = pf.PRODUCT_FEATURE_ID
-          LEFT JOIN product p ON pfa.PRODUCT_ID = p.PRODUCT_ID
-          LEFT JOIN product_price pp ON pp.PRODUCT_ID = pa.PRODUCT_ID
-          WHERE pa.PRODUCT_ID = '$mainProductID'";
+            // genric SQL query to fetch product features and standard features
+            $featureSql = "SELECT pf.PRODUCT_FEATURE_ID,
+             pf.PRODUCT_FEATURE_TYPE_ID, pf.DESCRIPTION, p.MEDIUM_IMAGE_URL, pp.PRICE, p.PRODUCT_NAME,
+             p.IS_VIRTUAL, p.IS_VARIANT, pf.PRODUCT_FEATURE_ID, pf.DEFAULT_AMOUNT
+            FROM product_feature pf
+            LEFT JOIN product_feature_appl pfa ON pfa.PRODUCT_FEATURE_ID = pf.PRODUCT_FEATURE_ID
+            LEFT JOIN product p ON p.PRODUCT_ID = pfa.PRODUCT_ID
+            LEFT JOIN product_price pp ON pp.PRODUCT_ID = pfa.PRODUCT_ID";
 
+            // Fetch additional information from the product_feature table for standard feature
+            $standardFeatureSql = $featureSql . " WHERE pfa.PRODUCT_ID = '$mainProductID'";
             $standardFeatureResult = mysqli_query($conn, $standardFeatureSql);
             $standardFeatureInfo = mysqli_fetch_assoc($standardFeatureResult);
 
             // Fetch additional information from the product_feature table
-            $featuresSql = "SELECT pf.PRODUCT_FEATURE_ID,
-             pf.PRODUCT_FEATURE_TYPE_ID, pf.DESCRIPTION, p.MEDIUM_IMAGE_URL, pp.PRICE, p.PRODUCT_NAME,
-             p.IS_VIRTUAL, p.IS_VARIANT, pf.PRODUCT_FEATURE_ID, pf.DEFAULT_AMOUNT
-            FROM product_feature pf
-            LEFT JOIN product_feature_appl pfa ON pfa.PRODUCT_FEATURE_ID =pf.PRODUCT_FEATURE_ID
-            LEFT JOIN product p ON p.PRODUCT_ID= pfa.PRODUCT_ID
-            LEFT JOIN product_price pp ON pp.PRODUCT_ID= pfa.PRODUCT_ID
-            WHERE pf.PRODUCT_FEATURE_ID='$standardFeatureID'";
+            $featuresSql = $featureSql . " WHERE pf.PRODUCT_FEATURE_ID = '$standardFeatureID'";
             $featuresResult = mysqli_query($conn, $featuresSql);
 
+
+
+            //array where store objects
             $relatedProducts = array();
             while ($featureInfo = mysqli_fetch_assoc($featuresResult)) {
                 $relatedProducts[] = array(
@@ -54,12 +49,11 @@ function getProductJson($productAssocProductId)
                     "PRODUCT_FEATURE_TYPE_ID" => $featureInfo['PRODUCT_FEATURE_TYPE_ID'],
                     "PRODUCT_NAME" => $featureInfo['PRODUCT_NAME'],
                     "PRODUCT_IMAGE" => $featureInfo['MEDIUM_IMAGE_URL'],
-                    "PRODUCT_PRICE" => $featureInfo['PRICE'],
+                    // "PRODUCT_PRICE" => $featureInfo['PRICE'],
                     "DESCRIPTION" => $featureInfo['DESCRIPTION'],
                     "DEFAULT_AMOUNT" => $featureInfo['DEFAULT_AMOUNT']
                 );
             }
-
             // Store main product information only once for each unique main product ID
             if (!isset($data[$mainProductID])) {
                 $data[$mainProductID] = array(
@@ -79,7 +73,6 @@ function getProductJson($productAssocProductId)
             }
         }
     }
-
     echo '<script>';
     echo 'console.log(' . json_encode($data) . ');';
     echo '</script>';
@@ -89,6 +82,4 @@ function getProductJson($productAssocProductId)
 
 // function call and usage 
 // getProductJson("MN_SH_TT%");
-
-
 ?>

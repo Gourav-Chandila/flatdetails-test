@@ -3,7 +3,7 @@
 <div class="categoriesCollectionContainer">
     <div class="container-fluid mb-2 border-bottom border-dark">
         <div class="row justify-content-center p-4">
-        <h2 class="h2 text-nowrap">CATEGORIES COLLECTION</h2>
+            <h2 class="h2 text-nowrap">CATEGORIES COLLECTION</h2>
         </div>
         <!-- Carousel -->
         <div class="container text-center my-3">
@@ -11,7 +11,7 @@
                 <div id="recipeCarousel" class="carousel slide w-100" data-ride="carousel">
                     <div class="carousel-inner" role="listbox">
                         <?php
-
+                        //fetches showes categories
                         $categorySql = "SELECT pcc.PROD_CATALOG_ID,pc.PRODUCT_CATEGORY_ID ,pc.CATEGORY_NAME,pc.CATEGORY_IMAGE_URL
                         FROM product_category  pc
                         JOIN prod_catalog_category pcc ON pcc.PRODUCT_CATEGORY_ID = pc.PRODUCT_CATEGORY_ID
@@ -22,8 +22,8 @@
                         if (!$result) {
                             error_log("There is a problem with the query: " . mysqli_error($conn));
                         } else {
-                            $rowCount = mysqli_num_rows($result);
 
+                            $rowCount = mysqli_num_rows($result);
                             // Check if there are records
                             if ($rowCount > 0) {
                                 $itemsPerSlide = 3;
@@ -41,8 +41,36 @@
                                         if ($row) {
                                             echo '<div class="col-md-4 col-12">';
                                             echo '<div class="card card-body h-100">';
-                                            echo '<img class="img-fluid card-bg-color" style="object-fit: cover; height: 100%;" src="img/categories-img/' . $row['CATEGORY_IMAGE_URL'] . '">';
-                                            echo '<button class="btn btn-dark">' . $row['CATEGORY_NAME'] . '</button>';
+                                            echo '<img class="img-fluid card-bg-color" style="object-fit: cover; height: 100%;" src="img/categories-img/' . $row['CATEGORY_IMAGE_URL'] . '" >';
+
+                                            // using switch case to redirect specific page
+                                            $categoryName = $row['CATEGORY_NAME'];
+                                            $categoryUrl = '';
+                                            switch ($categoryName) {
+                                                case 'Men formal shoes':
+                                                    // $categoryUrl = 'Shoes.php?for=MN_SH_FR&category=' . urlencode($categoryName);
+                                                    $categoryUrl = 'show_products.php?for=MN_SH_FR';
+                                                    break;
+                                                case 'Men sports shoes':
+                                                    // $categoryUrl = 'Shoes.php?for=MN_SH_SP&category=' . urlencode($categoryName);
+                                                    $categoryUrl = 'show_products.php?for=MN_SH_SP';
+                                                    break;
+                                                case 'Women formal shoes':
+                                                    // $categoryUrl = 'Shoes.php?for=W_SH_FR&category=' . urlencode($categoryName);
+                                                    $categoryUrl = 'show_products.php?for=W_SH_FR';
+                                                    break;
+                                                case 'Women sports shoes':
+                                                    // $categoryUrl = 'Shoes.php?for=W_SH_SP&category=' . urlencode($categoryName);
+                                                    $categoryUrl = 'show_products.php?for=W_SH_SP';
+                                                    break;
+                                                default:
+                                                    // Default URL if CATEGORY_NAME doesn't match known categories
+                                                    $categoryUrl = '#';
+                                                    break;
+                                            }
+
+                                            // // Output the button with the determined URL
+                                            echo '<a class="btn btn-dark" href="' . $categoryUrl . '">' . $categoryName . '</a>';
                                             echo '</div>';
                                             echo '</div>';
                                         }

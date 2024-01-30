@@ -62,21 +62,21 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['selectedColors'])) {
 
     // Array to store product feature IDs
     $productFeatureIds = [];
-    // if (!empty($product_size)) {
-    //     // Insert product feature for size
-    //     $productFeatureId = generateUniqueId($conn, 'PROD_FE_', 'product_feature');
-    //     echo "<br>Prod feature id for size is : " . $productFeatureId;
-    //     $insertProductFeature = array(
-    //         'PRODUCT_FEATURE_ID' => $productFeatureId,
-    //         'PRODUCT_FEATURE_TYPE_ID' => 'SIZE',
-    //         'PRODUCT_FEATURE_CATEGORY_ID' => $prodFeatureCategoryId,
-    //         'DESCRIPTION' => $product_size,
-    //         'UOM_ID' => 'INR'
-    //     );
-    //     insertData("product_feature", $insertProductFeature, $conn);
-    //     // Add the product feature ID to the array
-    //     $productFeatureIds[] = $productFeatureId;
-    // }
+    if (!empty($product_size)) {
+        // Insert product feature for size
+        $productFeatureId = generateUniqueId($conn, 'PROD_FE_', 'product_feature');
+        echo "<br>Prod feature id for size is : " . $productFeatureId;
+        $insertProductFeature = array(
+            'PRODUCT_FEATURE_ID' => $productFeatureId,
+            'PRODUCT_FEATURE_TYPE_ID' => 'SIZE',
+            'PRODUCT_FEATURE_CATEGORY_ID' => $prodFeatureCategoryId,
+            'DESCRIPTION' => $product_size,
+            'UOM_ID' => 'INR'
+        );
+        insertData("product_feature", $insertProductFeature, $conn);
+        // Add the product feature ID to the array
+        $productFeatureIds[] = $productFeatureId;
+    }
 
 
     if (!empty($selectedSizes)) {
@@ -203,9 +203,9 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['selectedColors'])) {
                                 {"product_sizes":{"name":"Select product sizes : ","elementName":"sizeDropdown","elementIdName":"sizeDropdown","options":[{"value":"7","data_name":"7"},{"value":"8","data_name":"8"},{"value":"9","data_name":"9"},{"value":"10","data_name":"10"}]}}
                         
                             ]');
-                            $productColorsImage = array(
-                                '#fff6db' => 'menFormalSlipOnShoesBrown.jpg',
-                            );
+                $productColorsImage = array(
+                    '#fff6db' => 'menFormalSlipOnShoesBrown.jpg',
+                );
                 // Counts elements in an array '$jsonSetCategoriesStructure'
                 $itemCount = count($jsonTopSellingStructure);
                 for ($i = 0; $i < $itemCount; $i++) {
@@ -250,7 +250,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['selectedColors'])) {
                     </div>
                 </div>
                 <div class="row">
-                    
+
                 </div>
                 <button type="submit" class="btn btn-primary btn success ml-3 mt-2 px-3 py-1">Submit</button>
             </form>

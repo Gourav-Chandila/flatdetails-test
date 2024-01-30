@@ -1,6 +1,5 @@
 <?php
 session_start();
-
 if (isset($_GET['key'])) {
     $key = $_GET['key'];
 
@@ -14,7 +13,6 @@ if (isset($_GET['key'])) {
     foreach ($_SESSION['selectedProducts'] as $product) {
         $totalPrice += floatval($product['price']);
     }
-
     // Return the updated total price as a response
     echo number_format($totalPrice, 2);
 }

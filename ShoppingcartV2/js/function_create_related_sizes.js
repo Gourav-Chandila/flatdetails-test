@@ -16,7 +16,7 @@ function createRelatedSizesElement(relatedProducts, relatedProductIdTo, index) {
             var isSelected = !firstSizeSelected ? 'border: 1.5px solid red;' : '';
 
             // Make the size div clickable using onClick function 
-            relatedSizesDivs += `<div id="${divId}" class="d-inline-block mr-1 p-1" style="background-color: #e4e6eb; cursor: pointer; ${isSelected}" onclick="handleSizeClick(this, '${relatedProduct.DESCRIPTION}', '${relatedProduct.PRODUCT_IMAGE}', ${relatedProduct.DEFAULT_AMOUNT}, ${index})">${relatedProduct.DESCRIPTION}</div>`;
+            relatedSizesDivs += `<div id="${divId}" class="d-inline-block mr-1 p-1" style="background-color: #e4e6eb; cursor: pointer; ${isSelected}" onclick="handleSizeClick(this, '${relatedProduct.DESCRIPTION}', '${relatedProduct.PRODUCT_IMAGE}', ${relatedProduct.DEFAULT_AMOUNT},'${relatedProduct.PRODUCT_ID_TO}', ${index})"> ${relatedProduct.DESCRIPTION}</div>`;
 
             // Trigger click event for the first size div
             if (!firstSizeSelected) {
